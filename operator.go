@@ -67,3 +67,24 @@ func (p filterOperator) Next() (batch, util.FastIntSet) {
 	}
 	return b, outputBitmap
 }
+
+type projectOperator struct {
+	input BatchRowSource
+
+	projections []int
+
+	internalBatch batch
+}
+
+func (p *projectOperator) Init() {
+	p.internalBatch = make(batch, len(p.projections)*batchRowLen)
+}
+
+func (p projectOperator) Next() (batch, util.FastIntSet) {
+	b, inputBitmap := p.input.Next()
+
+	for i, c := range p.projections {
+		copy(p.internalBatch[i*batchRowLen:i*batchRowLen+batchRowLen], b[c*batchRowLen:(c*batchRowLen)+batchRowLen])
+	}
+	return p.internalBatch, inputBitmap
+}

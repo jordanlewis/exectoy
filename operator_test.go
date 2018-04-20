@@ -27,3 +27,21 @@ func BenchmarkFilterOperator(b *testing.B) {
 		fop.Next()
 	}
 }
+
+func BenchmarkProjectOperator(b *testing.B) {
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+
+	var pop projectOperator
+	pop.input = &source
+	// project 2 out of 4 columns
+	pop.projections = []int{1, 2}
+	pop.Init()
+
+	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
+
+	for i := 0; i < b.N; i++ {
+		pop.Next()
+	}
+}
