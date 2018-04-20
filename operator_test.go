@@ -10,7 +10,7 @@ func randomizeSource(s *repeatableBatchSource) {
 	rngesus := rand.New(rand.NewSource(seed))
 
 	for i := 0; i < s.numOutputCols*batchRowLen; i++ {
-		s.internalBatch[i] = rngesus.Int() % 128
+		s.internalBatch[i/batchRowLen][i%batchRowLen] = rngesus.Int() % 128
 	}
 }
 

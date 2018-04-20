@@ -6,8 +6,8 @@ import (
 
 const batchRowLen = 2000
 
-type batch []int
 type column []int
+type batch []column
 type tuple []int
 
 type repeatableBatchSource struct {
@@ -22,7 +22,11 @@ func (s *repeatableBatchSource) Next() (batch, util.FastIntSet) {
 }
 
 func (s *repeatableBatchSource) Init() {
-	s.internalBatch = make(batch, s.numOutputCols*batchRowLen)
+	b := make([]int, s.numOutputCols*batchRowLen)
+	s.internalBatch = make(batch, s.numOutputCols)
+	for i := range s.internalBatch {
+		s.internalBatch[i] = column(b[i*batchRowLen : (i+1)*batchRowLen])
+	}
 	repeatableRowSourceIntSet.AddRange(0, batchRowLen)
 }
 
@@ -62,7 +66,7 @@ func (p filterOperator) Next() (batch, util.FastIntSet) {
 				continue
 			}
 			// Filter step.
-			if b[i+(batchRowLen*(bCol-1))] > 64 {
+			if b[bCol-1][i] > 64 {
 				outputBitmap.Add(i)
 			}
 		}
@@ -79,14 +83,14 @@ type projectOperator struct {
 }
 
 func (p *projectOperator) Init() {
-	p.internalBatch = make(batch, len(p.projections)*batchRowLen)
+	p.internalBatch = make(batch, len(p.projections))
 }
 
 func (p projectOperator) Next() (batch, util.FastIntSet) {
 	b, inputBitmap := p.input.Next()
 
 	for i, c := range p.projections {
-		copy(p.internalBatch[i*batchRowLen:i*batchRowLen+batchRowLen], b[c*batchRowLen:(c*batchRowLen)+batchRowLen])
+		p.internalBatch[i] = b[c]
 	}
 	return p.internalBatch, inputBitmap
 }
@@ -105,8 +109,8 @@ type renderIntPlusConstOperator struct {
 func (p *renderIntPlusConstOperator) Next() (batch, util.FastIntSet) {
 	b, inputBitmap := p.input.Next()
 
-	renderCol := b[p.outputIdx*batchRowLen : (p.outputIdx+1)*batchRowLen]
-	intCol := b[p.intIdx*batchRowLen : (p.intIdx+1)*batchRowLen]
+	renderCol := b[p.outputIdx]
+	intCol := b[p.intIdx]
 	for i := 0; i < batchRowLen; i++ {
 		renderCol[i] = intCol[i] + p.constArg
 	}
@@ -128,9 +132,9 @@ type renderIntPlusIntOperator struct {
 func (p renderIntPlusIntOperator) Next() (batch, util.FastIntSet) {
 	b, inputBitmap := p.input.Next()
 
-	renderCol := b[p.outputIdx*batchRowLen : (p.outputIdx+1)*batchRowLen]
-	col1 := b[p.int1Idx*batchRowLen : (p.int1Idx+1)*batchRowLen]
-	col2 := b[p.int2Idx*batchRowLen : (p.int2Idx+1)*batchRowLen]
+	renderCol := b[p.outputIdx]
+	col1 := b[p.int1Idx]
+	col2 := b[p.int2Idx]
 	for i := 0; i < batchRowLen; i++ {
 		renderCol[i] = col1[i] + col2[i]
 	}
@@ -143,7 +147,7 @@ type sortedDistinctOperator struct {
 	input BatchRowSource
 
 	sortedDistinctCols []int
-	colSlices          []column
+	cols               []column
 
 	lastVal tuple
 	curVal  tuple
@@ -153,8 +157,8 @@ type sortedDistinctOperator struct {
 }
 
 func (p *sortedDistinctOperator) Init() {
-	p.internalBatch = make(batch, p.numOutputCols*batchRowLen)
-	p.colSlices = make([]column, len(p.sortedDistinctCols))
+	p.internalBatch = make(batch, p.numOutputCols)
+	p.cols = make([]column, len(p.sortedDistinctCols))
 	p.lastVal = make(tuple, len(p.sortedDistinctCols))
 	p.curVal = make(tuple, len(p.sortedDistinctCols))
 }
@@ -167,13 +171,13 @@ func (p *sortedDistinctOperator) Next() (batch, util.FastIntSet) {
 		b, _ = p.input.Next()
 
 		for i, c := range p.sortedDistinctCols {
-			p.colSlices[i] = column(b[c*batchRowLen : (c+1)*batchRowLen])
+			p.cols[i] = b[c]
 		}
 
 		for r := 0; r < batchRowLen; r++ {
 			emit := false
 			for i := range p.sortedDistinctCols {
-				col := p.colSlices[i][r]
+				col := p.cols[i][r]
 				p.curVal[i] = col
 				if col != p.lastVal[i] {
 					emit = true
@@ -196,7 +200,7 @@ type copyOperator struct {
 }
 
 func (p *copyOperator) Init() {
-	p.internalBatch = make(batch, p.numOutputCols*batchRowLen)
+	p.internalBatch = make(batch, p.numOutputCols)
 }
 
 func (p copyOperator) Next() (batch, util.FastIntSet) {
