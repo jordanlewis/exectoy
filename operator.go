@@ -88,3 +88,68 @@ func (p projectOperator) Next() (batch, util.FastIntSet) {
 	}
 	return p.internalBatch, inputBitmap
 }
+
+// These will get templated implementations!
+type renderIntPlusConstOperator struct {
+	input BatchRowSource
+
+	intIdx   int
+	constArg int
+
+	outputIdx     int
+	numOutputCols int
+}
+
+func (p *renderIntPlusConstOperator) Next() (batch, util.FastIntSet) {
+	b, inputBitmap := p.input.Next()
+
+	renderCol := b[p.outputIdx*batchRowLen : (p.outputIdx+1)*batchRowLen]
+	intCol := b[p.intIdx*batchRowLen : (p.intIdx+1)*batchRowLen]
+	for i := 0; i < batchRowLen; i++ {
+		renderCol[i] = intCol[i] + p.constArg
+	}
+	return b, inputBitmap
+}
+
+func (p renderIntPlusConstOperator) Init() {}
+
+type renderIntPlusIntOperator struct {
+	input BatchRowSource
+
+	int1Idx int
+	int2Idx int
+
+	outputIdx     int
+	numOutputCols int
+}
+
+func (p renderIntPlusIntOperator) Next() (batch, util.FastIntSet) {
+	b, inputBitmap := p.input.Next()
+
+	renderCol := b[p.outputIdx*batchRowLen : (p.outputIdx+1)*batchRowLen]
+	col1 := b[p.int1Idx*batchRowLen : (p.int1Idx+1)*batchRowLen]
+	col2 := b[p.int2Idx*batchRowLen : (p.int2Idx+1)*batchRowLen]
+	for i := 0; i < batchRowLen; i++ {
+		renderCol[i] = col1[i] + col2[i]
+	}
+	return b, inputBitmap
+}
+
+func (p *renderIntPlusIntOperator) Init() {}
+
+type copyOperator struct {
+	input BatchRowSource
+
+	numOutputCols int
+	internalBatch batch
+}
+
+func (p *copyOperator) Init() {
+	p.internalBatch = make(batch, p.numOutputCols*batchRowLen)
+}
+
+func (p copyOperator) Next() (batch, util.FastIntSet) {
+	b, inputBitmap := p.input.Next()
+	copy(p.internalBatch, b)
+	return p.internalBatch, inputBitmap
+}

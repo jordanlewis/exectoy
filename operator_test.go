@@ -49,3 +49,74 @@ func BenchmarkProjectOperator(b *testing.B) {
 		pop.Next()
 	}
 }
+
+func BenchmarkRenderIntPlusConst(b *testing.B) {
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
+
+	var rop renderIntPlusConstOperator
+	rop.input = &source
+	rop.intIdx = 2
+	rop.constArg = 5
+	rop.outputIdx = 3
+	rop.numOutputCols = source.numOutputCols
+	rop.Init()
+
+	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
+
+	for i := 0; i < b.N; i++ {
+		rop.Next()
+	}
+}
+
+func BenchmarkRenderIntPlusInt(b *testing.B) {
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
+
+	var rop renderIntPlusIntOperator
+	rop.input = &source
+	rop.int1Idx = 2
+	rop.int2Idx = 3
+	rop.outputIdx = 3
+	rop.numOutputCols = source.numOutputCols
+	rop.Init()
+
+	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
+
+	for i := 0; i < b.N; i++ {
+		rop.Next()
+	}
+}
+
+func BenchmarkRenderChain(b *testing.B) {
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
+
+	var rop renderIntPlusIntOperator
+	rop.input = &source
+	rop.int1Idx = 2
+	rop.int2Idx = 3
+	rop.outputIdx = 3
+	rop.numOutputCols = source.numOutputCols
+	rop.Init()
+
+	var rop2 renderIntPlusIntOperator
+	rop2.input = &rop
+	rop2.int1Idx = 2
+	rop2.int2Idx = 3
+	rop2.outputIdx = 3
+	rop2.numOutputCols = rop.numOutputCols
+	rop2.Init()
+
+	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
+
+	for i := 0; i < b.N; i++ {
+		rop2.Next()
+	}
+}
