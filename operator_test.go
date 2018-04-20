@@ -1,4 +1,4 @@
-package distsqlrun
+package main
 
 import (
 	"math/rand"

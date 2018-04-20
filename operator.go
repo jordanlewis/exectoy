@@ -1,4 +1,4 @@
-package distsqlrun
+package main
 
 import (
 	"github.com/cockroachdb/cockroach/pkg/util"
