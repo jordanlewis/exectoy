@@ -161,9 +161,10 @@ func (p *sortedDistinctOperator) Init() {
 
 func (p *sortedDistinctOperator) Next() (batch, util.FastIntSet) {
 	// outputBitmap contains row indexes that we will output
+	var b batch
 	var outputBitmap util.FastIntSet
 	for outputBitmap.Empty() {
-		b, _ := p.input.Next()
+		b, _ = p.input.Next()
 
 		for i, c := range p.sortedDistinctCols {
 			p.colSlices[i] = column(b[c*batchRowLen : (c+1)*batchRowLen])
