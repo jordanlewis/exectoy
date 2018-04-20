@@ -1,4 +1,4 @@
-package main
+package exectoy
 
 import (
 	"math/rand"
