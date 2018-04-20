@@ -184,7 +184,7 @@ func (p *sortedDistinctOperator) Next() (batch, util.FastIntSet) {
 			}
 		}
 	}
-	return nil, outputBitmap
+	return b, outputBitmap
 }
 
 type copyOperator struct {
