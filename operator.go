@@ -4,9 +4,11 @@ import (
 	"github.com/cockroachdb/cockroach/pkg/util"
 )
 
-const batchRowLen = 16
+const batchRowLen = 2000
 
 type batch []int
+type column []int
+type tuple []int
 
 type repeatableBatchSource struct {
 	numOutputCols int
@@ -136,6 +138,54 @@ func (p renderIntPlusIntOperator) Next() (batch, util.FastIntSet) {
 }
 
 func (p *renderIntPlusIntOperator) Init() {}
+
+type sortedDistinctOperator struct {
+	input BatchRowSource
+
+	sortedDistinctCols []int
+	colSlices          []column
+
+	lastVal tuple
+	curVal  tuple
+
+	numOutputCols int
+	internalBatch batch
+}
+
+func (p *sortedDistinctOperator) Init() {
+	p.internalBatch = make(batch, p.numOutputCols*batchRowLen)
+	p.colSlices = make([]column, len(p.sortedDistinctCols))
+	p.lastVal = make(tuple, len(p.sortedDistinctCols))
+	p.curVal = make(tuple, len(p.sortedDistinctCols))
+}
+
+func (p *sortedDistinctOperator) Next() (batch, util.FastIntSet) {
+	// outputBitmap contains row indexes that we will output
+	var outputBitmap util.FastIntSet
+	for outputBitmap.Empty() {
+		b, _ := p.input.Next()
+
+		for i, c := range p.sortedDistinctCols {
+			p.colSlices[i] = column(b[c*batchRowLen : (c+1)*batchRowLen])
+		}
+
+		for r := 0; r < batchRowLen; r++ {
+			emit := false
+			for i := range p.sortedDistinctCols {
+				col := p.colSlices[i][r]
+				p.curVal[i] = col
+				if col != p.lastVal[i] {
+					emit = true
+				}
+			}
+			if emit {
+				copy(p.lastVal, p.curVal)
+				outputBitmap.Add(r)
+			}
+		}
+	}
+	return nil, outputBitmap
+}
 
 type copyOperator struct {
 	input BatchRowSource

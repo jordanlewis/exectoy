@@ -120,3 +120,21 @@ func BenchmarkRenderChain(b *testing.B) {
 		rop2.Next()
 	}
 }
+
+func BenchmarkSortedDistinct(b *testing.B) {
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
+
+	var sdop sortedDistinctOperator
+	sdop.sortedDistinctCols = []int{1, 2}
+	sdop.numOutputCols = 4
+	sdop.input = &source
+	sdop.Init()
+
+	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
+	for i := 0; i < b.N; i++ {
+		sdop.Next()
+	}
+}
