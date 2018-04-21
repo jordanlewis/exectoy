@@ -37,36 +37,34 @@ type BatchRowSource interface {
 	Next() (batch, util.FastIntSet)
 }
 
-type filterOperator struct {
+type filterIntLessThanConstOperator struct {
 	input BatchRowSource
+
+	colIdx   int
+	constArg int
 
 	numCols int
 }
 
-var _ BatchRowSource = &filterOperator{}
+var _ BatchRowSource = &filterIntLessThanConstOperator{}
 
-func (p *filterOperator) Init() {}
+func (p *filterIntLessThanConstOperator) Init() {}
 
-func (p filterOperator) Next() (batch, util.FastIntSet) {
+func (p *filterIntLessThanConstOperator) Next() (batch, util.FastIntSet) {
 	var b batch
 	// outputBitmap contains row indexes that we will output
 	var outputBitmap util.FastIntSet
 
 	for outputBitmap.Empty() {
-		b, inputBitmap := p.input.Next()
+		b, _ := p.input.Next()
 		if b == nil {
 			return nil, outputBitmap
 		}
-
-		// Select b where a > 64
-		bCol := 2
+		col := b[p.colIdx]
 
 		for i := 0; i < batchRowLen; i++ {
-			if !inputBitmap.Contains(i) {
-				continue
-			}
 			// Filter step.
-			if b[bCol-1][i] > 64 {
+			if col[i] < p.constArg {
 				outputBitmap.Add(i)
 			}
 		}
@@ -142,6 +140,15 @@ func (p renderIntPlusIntOperator) Next() (batch, util.FastIntSet) {
 }
 
 func (p *renderIntPlusIntOperator) Init() {}
+
+type renderIntEqualsIntOperator struct {
+	input BatchRowSource
+
+	int1Idx int
+	int2Idx int
+}
+
+func (p *renderIntEqualsIntOperator) Init() {}
 
 type sortedDistinctOperator struct {
 	input BatchRowSource

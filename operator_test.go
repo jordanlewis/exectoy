@@ -14,14 +14,16 @@ func randomizeSource(s *repeatableBatchSource) {
 	}
 }
 
-func BenchmarkFilterOperator(b *testing.B) {
+func BenchmarkFilterIntLessThanConstOperator(b *testing.B) {
 	var source repeatableBatchSource
 	source.numOutputCols = 4
 	source.Init()
 	randomizeSource(&source)
 
-	var fop filterOperator
+	var fop filterIntLessThanConstOperator
 	fop.input = &source
+	fop.constArg = 64
+	fop.colIdx = 3
 	fop.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
