@@ -20,10 +20,10 @@ func BenchmarkFilterIntLessThanConstOperator(b *testing.B) {
 	source.Init()
 	randomizeSource(&source)
 
-	var fop filterIntLessThanConstOperator
+	var fop selectLTIntIntConstOp
 	fop.input = &source
 	fop.constArg = 64
-	fop.colIdx = 3
+	fop.col1Idx = 3
 	fop.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
@@ -33,37 +33,17 @@ func BenchmarkFilterIntLessThanConstOperator(b *testing.B) {
 	}
 }
 
-func BenchmarkProjectOperator(b *testing.B) {
+func BenchmarkProjPlusIntIntConst(b *testing.B) {
 	var source repeatableBatchSource
 	source.numOutputCols = 4
 	source.Init()
 	randomizeSource(&source)
 
-	var pop projectOperator
-	pop.input = &source
-	// project 2 out of 4 columns
-	pop.projections = []int{1, 2}
-	pop.Init()
-
-	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
-
-	for i := 0; i < b.N; i++ {
-		pop.Next()
-	}
-}
-
-func BenchmarkRenderIntPlusConst(b *testing.B) {
-	var source repeatableBatchSource
-	source.numOutputCols = 4
-	source.Init()
-	randomizeSource(&source)
-
-	var rop renderIntPlusConstOperator
+	var rop projPlusIntIntConst
 	rop.input = &source
 	rop.intIdx = 2
 	rop.constArg = 5
 	rop.outputIdx = 3
-	rop.numOutputCols = source.numOutputCols
 	rop.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
@@ -73,18 +53,17 @@ func BenchmarkRenderIntPlusConst(b *testing.B) {
 	}
 }
 
-func BenchmarkRenderIntPlusInt(b *testing.B) {
+func BenchmarkProjPlusIntInt(b *testing.B) {
 	var source repeatableBatchSource
 	source.numOutputCols = 4
 	source.Init()
 	randomizeSource(&source)
 
-	var rop renderIntPlusIntOperator
+	var rop projPlusIntInt
 	rop.input = &source
 	rop.int1Idx = 2
 	rop.int2Idx = 3
 	rop.outputIdx = 3
-	rop.numOutputCols = source.numOutputCols
 	rop.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
@@ -100,20 +79,18 @@ func BenchmarkRenderChain(b *testing.B) {
 	source.Init()
 	randomizeSource(&source)
 
-	var rop renderIntPlusIntOperator
+	var rop projPlusIntInt
 	rop.input = &source
 	rop.int1Idx = 2
 	rop.int2Idx = 3
 	rop.outputIdx = 3
-	rop.numOutputCols = source.numOutputCols
 	rop.Init()
 
-	var rop2 renderIntPlusIntOperator
+	var rop2 projPlusIntInt
 	rop2.input = &rop
 	rop2.int1Idx = 2
 	rop2.int2Idx = 3
 	rop2.outputIdx = 3
-	rop2.numOutputCols = rop.numOutputCols
 	rop2.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
@@ -123,6 +100,7 @@ func BenchmarkRenderChain(b *testing.B) {
 	}
 }
 
+/*
 func BenchmarkSortedDistinct(b *testing.B) {
 	var source repeatableBatchSource
 	source.numOutputCols = 4
@@ -140,3 +118,4 @@ func BenchmarkSortedDistinct(b *testing.B) {
 		sdop.Next()
 	}
 }
+*/
