@@ -100,6 +100,45 @@ func BenchmarkRenderChain(b *testing.B) {
 	}
 }
 
+func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
+	// this benchmarks a query like:
+	// SELECT o FROM t WHERE n + 1 > m
+	// on a table t [n, m, o, p]
+
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
+
+	// first project n -> n+1
+	projOp := projPlusIntIntConst{
+		input:     &source,
+		intIdx:    0,
+		constArg:  1,
+		outputIdx: 0,
+	}
+	projOp.Init()
+
+	// then select (n+1) > m
+	selOp := selectLTIntIntOp{
+		input:   &projOp,
+		col1Idx: 1,
+		col2Idx: 0,
+	}
+	selOp.Init()
+
+	matOp := materializeOp{
+		input: &selOp,
+		cols:  []int{2},
+	}
+	matOp.Init()
+
+	b.SetBytes(int64(8 * source.numOutputCols))
+	for i := 0; i < b.N; i++ {
+		matOp.NextRow()
+	}
+}
+
 /*
 func BenchmarkSortedDistinct(b *testing.B) {
 	var source repeatableBatchSource

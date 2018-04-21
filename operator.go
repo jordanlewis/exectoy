@@ -13,7 +13,8 @@ type dataFlow struct {
 	n      int
 	b      batch
 	useSel bool
-	sel    column
+	// if useSel is true, a selection vector from upstream.
+	sel column
 }
 type tuple []int
 
