@@ -139,7 +139,6 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 	}
 }
 
-/*
 func BenchmarkSortedDistinct(b *testing.B) {
 	var source repeatableBatchSource
 	source.numOutputCols = 4
@@ -157,4 +156,3 @@ func BenchmarkSortedDistinct(b *testing.B) {
 		sdop.Next()
 	}
 }
-*/
