@@ -48,9 +48,7 @@ doing a column's worth of work at once:
 
 ```
 // first create an n + 1 result, for all values in the n column
-projPlusIntIntConst.Next():
-  batch = source.Next()
-
+projPlusIntIntConst.Next(batch):
   for i < batch.n:
     outCol[i] = intCol[i] + constArg
 
@@ -59,9 +57,7 @@ projPlusIntIntConst.Next():
 // then, compare the new column to the m column, putting the result into
 // a selection vector: a list of the selected indexes in the column batch
 
-selectLTIntInt.Next():
-  batch = source.Next()
-
+selectLTIntInt.Next(batch):
   for i < batch.n:
     if int1Col < int2Col:
       selectionVector.append(i)
@@ -71,9 +67,7 @@ selectLTIntInt.Next():
 // finally, we materialize the batch, returning actual rows to the user,
 // containing just the columns requested:
 
-materialize.Next():
-  batch = source.Next()
-
+materialize.Next(batch):
   for s < batch.n:
     i = selectionVector[i]
     returnedRow row

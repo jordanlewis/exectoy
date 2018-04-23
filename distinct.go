@@ -12,9 +12,7 @@ package exectoy
 // selection vector.
 //
 // This would allow sorted distinct to operate on arbitrary types.
-type sortedDistinctOperator struct {
-	input ExecOp
-
+type sortedDistinctOp struct {
 	sortedDistinctCols []int
 
 	cols      []column
@@ -22,18 +20,19 @@ type sortedDistinctOperator struct {
 	outputVec []int
 }
 
+var _ ExecOp = &sortedDistinctOp{}
+
 var zeroVec = make([]int, batchRowLen)
 
-func (p *sortedDistinctOperator) Init() {
+func (p *sortedDistinctOp) Init() {
 	p.cols = make([]column, len(p.sortedDistinctCols))
 	p.lastVal = make(tuple, len(p.sortedDistinctCols))
 	p.outputVec = make([]int, batchRowLen)
 }
 
-func (p *sortedDistinctOperator) Next() dataFlow {
+func (p *sortedDistinctOp) Next(flow dataFlow) dataFlow {
 	copy(p.outputVec, zeroVec)
 	// outputBitmap contains row indexes that we will output
-	flow := p.input.Next()
 	if flow.n == 0 {
 		return flow
 	}

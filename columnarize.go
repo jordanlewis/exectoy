@@ -22,6 +22,8 @@ type columnarizeOp struct {
 	internalSel   column
 }
 
+var _ ExecSource = &columnarizeOp{}
+
 func (c *columnarizeOp) Init() {
 	b := make([]int, c.numCols*batchRowLen)
 	c.internalBatch = make(batch, c.numCols)

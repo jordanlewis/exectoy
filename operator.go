@@ -1,9 +1,5 @@
 package exectoy
 
-import (
-	"github.com/cockroachdb/cockroach/pkg/util"
-)
-
 const batchRowLen = 1024
 
 type column []int
@@ -22,10 +18,16 @@ type dataFlow struct {
 	sel column
 }
 
+// ExecSource is an exectoy datasource.
+type ExecSource interface {
+	Init()
+	Next() dataFlow
+}
+
 // ExecOp is an exectoy operator.
 type ExecOp interface {
 	Init()
-	Next() dataFlow
+	Next(dataFlow) dataFlow
 }
 
 // TupleSource returns a tuple on each call to NextTuple.
@@ -39,7 +41,7 @@ type repeatableBatchSource struct {
 	internalSel   column
 }
 
-var repeatableRowSourceIntSet util.FastIntSet
+var _ ExecSource = &repeatableBatchSource{}
 
 func (s *repeatableBatchSource) Next() dataFlow {
 	return dataFlow{
@@ -57,10 +59,7 @@ func (s *repeatableBatchSource) Init() {
 	for i := range s.internalBatch {
 		s.internalBatch[i] = column(b[i*batchRowLen : (i+1)*batchRowLen])
 	}
-	repeatableRowSourceIntSet.AddRange(0, batchRowLen)
 }
-
-var _ ExecOp = &repeatableBatchSource{}
 
 /*
 

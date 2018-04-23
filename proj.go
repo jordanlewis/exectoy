@@ -2,17 +2,17 @@ package exectoy
 
 // These will get templated implementations!
 type projPlusIntIntConst struct {
-	input ExecOp
-
 	intIdx   int
 	constArg int
 
 	outputIdx int
 }
 
-func (p *projPlusIntIntConst) Next() dataFlow {
-	flow := p.input.Next()
+var _ ExecOp = &projPlusIntIntConst{}
 
+func (p projPlusIntIntConst) Init() {}
+
+func (p *projPlusIntIntConst) Next(flow dataFlow) dataFlow {
 	projCol := flow.b[p.outputIdx]
 	intCol := flow.b[p.intIdx]
 	if flow.useSel {
@@ -28,20 +28,18 @@ func (p *projPlusIntIntConst) Next() dataFlow {
 	return flow
 }
 
-func (p projPlusIntIntConst) Init() {}
-
 type projPlusIntInt struct {
-	input ExecOp
-
 	int1Idx int
 	int2Idx int
 
 	outputIdx int
 }
 
-func (p projPlusIntInt) Next() dataFlow {
-	flow := p.input.Next()
+var _ ExecOp = &projPlusIntInt{}
 
+func (p *projPlusIntInt) Init() {}
+
+func (p projPlusIntInt) Next(flow dataFlow) dataFlow {
 	projCol := flow.b[p.outputIdx]
 	col1 := flow.b[p.int1Idx]
 	col2 := flow.b[p.int2Idx]
@@ -57,5 +55,3 @@ func (p projPlusIntInt) Next() dataFlow {
 	}
 	return flow
 }
-
-func (p *projPlusIntInt) Init() {}

@@ -6,17 +6,15 @@ package exectoy
 // res is the output selection vector.
 // returned is the number of rows in the selection vector
 type selectLTIntIntConstOp struct {
-	input ExecOp
-
 	col1Idx  int
 	constArg int
 }
 
+var _ ExecOp = &selectLTIntIntConstOp{}
+
 func (p *selectLTIntIntConstOp) Init() {}
 
-func (p *selectLTIntIntConstOp) Next() dataFlow {
-	flow := p.input.Next()
-
+func (p *selectLTIntIntConstOp) Next(flow dataFlow) dataFlow {
 	col1 := flow.b[p.col1Idx]
 	idx := 0
 	// hard to see how to eliminate this if.
@@ -42,17 +40,15 @@ func (p *selectLTIntIntConstOp) Next() dataFlow {
 }
 
 type selectLTIntIntOp struct {
-	input ExecOp
-
 	col1Idx int
 	col2Idx int
 }
 
+var _ ExecOp = &selectLTIntIntOp{}
+
 func (p *selectLTIntIntOp) Init() {}
 
-func (p *selectLTIntIntOp) Next() dataFlow {
-	flow := p.input.Next()
-
+func (p *selectLTIntIntOp) Next(flow dataFlow) dataFlow {
 	col1 := flow.b[p.col1Idx]
 	col2 := flow.b[p.col2Idx]
 

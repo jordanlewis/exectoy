@@ -72,21 +72,21 @@ func TestSortedDistinct(t *testing.T) {
 		tupleSource := &staticTupleSource{
 			tuples: tc.tuples,
 		}
-
-		columnarizeOp := &columnarizeOp{
-			input:   tupleSource,
-			numCols: tc.numCols,
+		engine := &Engine{
+			source: &columnarizeOp{
+				input:   tupleSource,
+				numCols: tc.numCols,
+			},
+			pipeline: []ExecOp{
+				&sortedDistinctOp{
+					sortedDistinctCols: tc.distinctCols,
+				},
+			},
 		}
-		columnarizeOp.Init()
-
-		sdop := &sortedDistinctOperator{
-			input:              columnarizeOp,
-			sortedDistinctCols: tc.distinctCols,
-		}
-		sdop.Init()
+		engine.Init()
 
 		mop := &materializeOp{
-			input: sdop,
+			input: engine,
 			cols:  []int{0, 1, 2, 3},
 		}
 		mop.Init()

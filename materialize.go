@@ -2,7 +2,7 @@ package exectoy
 
 // materializeOp takes dataFlows and turns them into tuples.
 type materializeOp struct {
-	input ExecOp
+	input ExecSource
 
 	cols []int
 
