@@ -28,7 +28,7 @@ next:
       returnedRow row
       for col in selectedCols:
         returnedRow.append(row[col])
-      return returned row
+      return returnedRow
 ```
 
 where filter is an `Expr` that's evaluated by simple interpretation - i.e.
@@ -48,7 +48,7 @@ doing a column's worth of work at once:
 
 ```
 // first create an n + 1 result, for all values in the n column
-projPlusIntIntConst.Next()
+projPlusIntIntConst.Next():
   batch = source.Next()
 
   for i < batch.n:
@@ -59,7 +59,7 @@ projPlusIntIntConst.Next()
 // then, compare the new column to the m column, putting the result into
 // a selection vector: a list of the selected indexes in the column batch
 
-selectLTIntInt.Next()
+selectLTIntInt.Next():
   batch = source.Next()
 
   for i < batch.n:
@@ -71,7 +71,7 @@ selectLTIntInt.Next()
 // finally, we materialize the batch, returning actual rows to the user,
 // containing just the columns requested:
 
-materialize.Next()
+materialize.Next():
   batch = source.Next()
 
   for s < batch.n:
