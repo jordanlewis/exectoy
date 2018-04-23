@@ -4,7 +4,7 @@ type staticTupleSource struct {
 	tuples []tuple
 }
 
-func (s *staticTupleSource) nextTuple() tuple {
+func (s *staticTupleSource) NextTuple() tuple {
 	if len(s.tuples) == 0 {
 		return nil
 	}
@@ -13,12 +13,9 @@ func (s *staticTupleSource) nextTuple() tuple {
 	return t
 }
 
-type tupleSource interface {
-	nextTuple() tuple
-}
-
+// columnarizeOp takes tuples and turns them into a dataFlow.
 type columnarizeOp struct {
-	input tupleSource
+	input TupleSource
 
 	numCols       int
 	internalBatch batch
@@ -41,7 +38,7 @@ func (c columnarizeOp) Next() dataFlow {
 		useSel: false,
 	}
 	for d.n < batchRowLen {
-		t := c.input.nextTuple()
+		t := c.input.NextTuple()
 		if t == nil {
 			break
 		}

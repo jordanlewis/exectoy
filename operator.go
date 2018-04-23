@@ -8,15 +8,30 @@ const batchRowLen = 1024
 
 type column []int
 type batch []column
+type tuple []int
+
+// dataFlow is the batch format passed around by operators.
 type dataFlow struct {
 	// length of batch or sel in tuples
-	n      int
+	n int
+	// slice of columns in this batch.
 	b      batch
 	useSel bool
-	// if useSel is true, a selection vector from upstream.
+	// if useSel is true, a selection vector from upstream. a selection vector is
+	// a list of selected column indexes in this dataFlow's columns.
 	sel column
 }
-type tuple []int
+
+// ExecOp is an exectoy operator.
+type ExecOp interface {
+	Init()
+	Next() dataFlow
+}
+
+// TupleSource returns a tuple on each call to NextTuple.
+type TupleSource interface {
+	NextTuple() tuple
+}
 
 type repeatableBatchSource struct {
 	numOutputCols int
@@ -46,11 +61,6 @@ func (s *repeatableBatchSource) Init() {
 }
 
 var _ ExecOp = &repeatableBatchSource{}
-
-type ExecOp interface {
-	Init()
-	Next() dataFlow
-}
 
 /*
 

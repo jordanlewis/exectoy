@@ -1,5 +1,6 @@
 package exectoy
 
+// materializeOp takes dataFlows and turns them into tuples.
 type materializeOp struct {
 	input ExecOp
 
@@ -20,7 +21,7 @@ func (t *materializeOp) Init() {
 	t.rows = t.rowsBuf[:0]
 }
 
-func (t *materializeOp) NextRow() tuple {
+func (t *materializeOp) NextTuple() tuple {
 	if len(t.rows) == 0 {
 		flow := t.input.Next()
 		if flow.n == 0 {

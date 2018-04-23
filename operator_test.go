@@ -34,7 +34,7 @@ func TestColumnarizeMaterialize(t *testing.T) {
 	materializeOp.Init()
 
 	for i := 0; i < 10; i++ {
-		tuple := materializeOp.NextRow()
+		tuple := materializeOp.NextTuple()
 		if !reflect.DeepEqual(tuple, tuples[i]) {
 			t.Errorf("expected %v, got %v", tuples[i], tuple)
 		}
@@ -93,7 +93,7 @@ func TestSortedDistinct(t *testing.T) {
 
 		var actual []tuple
 		for {
-			tuple := mop.NextRow()
+			tuple := mop.NextTuple()
 			if tuple == nil {
 				break
 			}

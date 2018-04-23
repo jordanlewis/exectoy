@@ -141,7 +141,7 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 
 		b.SetBytes(int64(8 * source.numOutputCols))
 		for i := 0; i < b.N; i++ {
-			matOp.NextRow()
+			matOp.NextTuple()
 		}
 	*/
 }
