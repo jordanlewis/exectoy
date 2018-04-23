@@ -1,5 +1,17 @@
 package exectoy
 
+// sortedDistinct runs a distinct on the columns in sortedDistinctCols.
+// Currently it's not even as RISC-y as it could be - it operators on all
+// of the sortedDistinctCols at once. This is a weakness because it can't be
+// made type-agnostic.
+//
+// What should really happen is that "sorted distinct" on n columns should be
+// implemented by n+1 operators. The first n operators do sorted distinct on a
+// single column, or-ing their distinct information with an output column like
+// the operator does today. The final operator turns the output column into a
+// selection vector.
+//
+// This would allow sorted distinct to operate on arbitrary types.
 type sortedDistinctOperator struct {
 	input ExecOp
 
