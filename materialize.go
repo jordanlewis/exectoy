@@ -10,6 +10,9 @@ type materializeOp struct {
 }
 
 func (t *materializeOp) Init() {
+	if t.cols == nil {
+		panic("didn't set cols on materializeOp")
+	}
 	t.rowsBuf = make([]tuple, batchRowLen)
 	for i := range t.rowsBuf {
 		t.rowsBuf[i] = make(tuple, len(t.cols))
@@ -20,6 +23,9 @@ func (t *materializeOp) Init() {
 func (t *materializeOp) NextRow() tuple {
 	if len(t.rows) == 0 {
 		flow := t.input.Next()
+		if flow.n == 0 {
+			return nil
+		}
 		t.rows = t.rowsBuf
 		if flow.useSel {
 			for outIdx, cIdx := range t.cols {
@@ -36,6 +42,7 @@ func (t *materializeOp) NextRow() tuple {
 				}
 			}
 		}
+		t.rows = t.rows[:flow.n]
 	}
 	ret := t.rows[0]
 	t.rows = t.rows[1:]
