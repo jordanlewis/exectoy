@@ -147,7 +147,6 @@ func BenchmarkSortedDistinct(b *testing.B) {
 
 	var sdop sortedDistinctOperator
 	sdop.sortedDistinctCols = []int{1, 2}
-	sdop.numOutputCols = 4
 	sdop.input = &source
 	sdop.Init()
 
