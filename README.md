@@ -139,3 +139,4 @@ A complete proof of concept for this needs a few more things:
 3. an escape hatch for row-based operators. we'll need to build in a way for
    operators to get a row-based computation model if they need one.
 4. an escape hatch for builtin functions.
+5. probably a harder operator than sorted distinct, like hash join or sort.
