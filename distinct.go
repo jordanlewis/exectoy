@@ -4,20 +4,15 @@ type sortedDistinctOperator struct {
 	input ExecOp
 
 	sortedDistinctCols []int
-	cols               []column
 
-	lastVal tuple
-
+	cols      []column
+	lastVal   tuple
 	outputVec []int
-
-	numOutputCols int
-	internalBatch batch
 }
 
 var zeroVec = make([]int, batchRowLen)
 
 func (p *sortedDistinctOperator) Init() {
-	p.internalBatch = make(batch, p.numOutputCols)
 	p.cols = make([]column, len(p.sortedDistinctCols))
 	p.lastVal = make(tuple, len(p.sortedDistinctCols))
 	p.outputVec = make([]int, batchRowLen)
@@ -27,6 +22,9 @@ func (p *sortedDistinctOperator) Next() dataFlow {
 	copy(p.outputVec, zeroVec)
 	// outputBitmap contains row indexes that we will output
 	flow := p.input.Next()
+	if flow.n == 0 {
+		return flow
+	}
 	for i, c := range p.sortedDistinctCols {
 		p.cols[i] = flow.b[c]
 	}
@@ -61,12 +59,13 @@ func (p *sortedDistinctOperator) Next() dataFlow {
 				}
 				*/
 				p.outputVec[i] |= (col[i] - lastVal)
+				lastVal = col[i]
 			}
 			p.lastVal[cIdx] = lastVal
 		}
 	}
-	// convert outputVec to sel
 
+	// convert outputVec to sel
 	idx := 0
 	if flow.useSel {
 		max := flow.sel[flow.n-1]
