@@ -127,16 +127,23 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 	}
 	selOp.Init()
 
-	matOp := materializeOp{
-		input: &selOp,
-		cols:  []int{2},
-	}
-	matOp.Init()
-
-	b.SetBytes(int64(8 * source.numOutputCols))
+	b.SetBytes(int64(8 * source.numOutputCols * batchRowLen))
 	for i := 0; i < b.N; i++ {
-		matOp.NextRow()
+		selOp.Next()
 	}
+
+	/*
+		matOp := materializeOp{
+			input: &selOp,
+			cols:  []int{2},
+		}
+		matOp.Init()
+
+		b.SetBytes(int64(8 * source.numOutputCols))
+		for i := 0; i < b.N; i++ {
+			matOp.NextRow()
+		}
+	*/
 }
 
 func BenchmarkSortedDistinct(b *testing.B) {
