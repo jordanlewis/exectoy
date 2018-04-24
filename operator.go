@@ -61,6 +61,16 @@ func (s *repeatableBatchSource) Init() {
 	}
 }
 
+type repeatableTupleSource struct {
+	t tuple
+}
+
+var _ TupleSource = &repeatableTupleSource{}
+
+func (s *repeatableTupleSource) NextTuple() tuple {
+	return s.t
+}
+
 /*
 
 type copyOperator struct {

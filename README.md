@@ -121,6 +121,17 @@ are - since every operator only operates on one or two columns, you get the
 rest of the columns "for free" in your benchmark, since nobody touches their
 data.
 
+Also include is a hard-coded tuple-at-a-time benchmark that does the same work
+as BenchmarkFilterIntLessThanConstOperator:
+
+```
+BenchmarkRowBasedFilterIntLessThanConst-8       200000000                7.62 ns/op     4196.92 MB/s
+```
+
+Even though it's hard coded, the tuple-at-a-time model can't compare in
+throughput to the equivalent column vector model, clocking in at between 5 and
+6 times as slow depending on what computer I run the benchmarks on.
+
 ----
 
 A complete proof of concept for this needs a few more things:

@@ -164,6 +164,38 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 	*/
 }
 
+// this is a copy of the test above that uses a per-tuple interface instead of a
+// columnarized one. It's also super efficient because it doesn't even have to
+// call any kind of Expr.Eval thing.
+type rowBasedFilterIntLessThanConst struct {
+	input         TupleSource
+	internalTuple tuple
+}
+
+func (r rowBasedFilterIntLessThanConst) NextTuple() tuple {
+	for {
+		t := r.input.NextTuple()
+		if t[0]+1 > t[1] {
+			r.internalTuple[0] = t[2]
+			return r.internalTuple
+		}
+	}
+}
+
+func BenchmarkRowBasedFilterIntLessThanConst(b *testing.B) {
+	source := &repeatableTupleSource{
+		t: []int{2, 2, 3, 4},
+	}
+	f := &rowBasedFilterIntLessThanConst{
+		input:         source,
+		internalTuple: make(tuple, 1),
+	}
+	b.SetBytes(int64(8 * 4))
+	for i := 0; i < b.N; i++ {
+		f.NextTuple()
+	}
+}
+
 func BenchmarkSortedDistinct(b *testing.B) {
 	source := &repeatableBatchSource{
 		numOutputCols: 4,
