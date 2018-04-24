@@ -14,6 +14,15 @@ func randomizeSource(s *repeatableBatchSource) {
 	}
 }
 
+func randomizeTupleBatchSouce(s *repeatableTupleBatchSource) {
+	seed := int64(12345)
+	rngesus := rand.New(rand.NewSource(seed))
+
+	for i := 0; i < s.numOutputCols*batchRowLen; i++ {
+		s.internalBatch[i/s.numOutputCols][i%s.numOutputCols] = rngesus.Int() % 128
+	}
+}
+
 func BenchmarkFilterIntLessThanConstOperator(b *testing.B) {
 	source := &repeatableBatchSource{
 		numOutputCols: 4,
@@ -183,6 +192,9 @@ func (r rowBasedFilterIntLessThanConst) NextTuple() tuple {
 }
 
 func BenchmarkRowBasedFilterIntLessThanConst(b *testing.B) {
+	// this benchmarks a query like:
+	// SELECT o FROM t WHERE n + 1 > m
+	// on a table t [n, m, o, p]
 	source := &repeatableTupleSource{
 		t: []int{2, 2, 3, 4},
 	}
@@ -193,6 +205,46 @@ func BenchmarkRowBasedFilterIntLessThanConst(b *testing.B) {
 	b.SetBytes(int64(8 * 4))
 	for i := 0; i < b.N; i++ {
 		f.NextTuple()
+	}
+}
+
+type rowBatchBasedFilterIntLessThanConst struct {
+	input       TupleBatchSource
+	internalSel column
+}
+
+func (r *rowBatchBasedFilterIntLessThanConst) Init() {
+	r.internalSel = make(column, batchRowLen)
+}
+
+func (r *rowBatchBasedFilterIntLessThanConst) NextTupleBatch() []tuple {
+	t := r.input.NextTupleBatch()
+	idx := 0
+	for i := range t {
+		if t[i][0]+1 > t[i][1] {
+			r.internalSel[i] = idx
+			idx++
+		}
+	}
+	return t
+}
+
+func BenchmarkRowBatchBasedFilterIntLessThanConst(b *testing.B) {
+	// this benchmarks a query like:
+	// SELECT o FROM t WHERE n + 1 > m
+	// on a table t [n, m, o, p]
+	source := &repeatableTupleBatchSource{
+		numOutputCols: 4,
+	}
+	source.Init()
+	randomizeTupleBatchSouce(source)
+	f := &rowBatchBasedFilterIntLessThanConst{
+		input: source,
+	}
+	f.Init()
+	b.SetBytes(int64(8 * 4 * batchRowLen))
+	for i := 0; i < b.N; i++ {
+		f.NextTupleBatch()
 	}
 }
 

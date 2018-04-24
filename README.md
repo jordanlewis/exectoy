@@ -108,12 +108,12 @@ fast, as you'd expect because it does so little:
 
 
 ```
-BenchmarkFilterIntLessThanConstOperator-8   	 1000000	      1643 ns/op	19933.23 MB/s
-BenchmarkProjPlusIntIntConst-8              	 1000000	      1038 ns/op	31541.04 MB/s
-BenchmarkProjPlusIntInt-8                   	 1000000	      1369 ns/op	23919.72 MB/s
-BenchmarkRenderChain-8                      	  500000	      2733 ns/op	11988.64 MB/s
-BenchmarkSelectIntPlusConstLTInt-8          	  500000	      3075 ns/op	10654.75 MB/s
-BenchmarkSortedDistinct-8                   	  300000	      5156 ns/op	6354.44 MB/s
+BenchmarkFilterIntLessThanConstOperator-8                1000000              1289 ns/op        25417.53 MB/s
+BenchmarkProjPlusIntIntConst-8                           2000000               661 ns/op        49501.89 MB/s
+BenchmarkProjPlusIntInt-8                                2000000               906 ns/op        36161.29 MB/s
+BenchmarkRenderChain-8                                   1000000              1773 ns/op        18477.98 MB/s
+BenchmarkSelectIntPlusConstLTInt-8                       1000000              1981 ns/op        16536.48 MB/s
+BenchmarkSortedDistinct-8                                 300000              4005 ns/op        8181.68 MB/s
 ```
 
 All benchmarks are on 4 columns, which makes the numbers look better than they
@@ -121,16 +121,18 @@ are - since every operator only operates on one or two columns, you get the
 rest of the columns "for free" in your benchmark, since nobody touches their
 data.
 
-Also include is a hard-coded tuple-at-a-time benchmark that does the same work
-as BenchmarkFilterIntLessThanConstOperator:
+Also included are two hard-coded row-oriented benchmarks that do the same thing
+as BenchmarkSelectIntPlusConstLTInt:
 
 ```
-BenchmarkRowBasedFilterIntLessThanConst-8       200000000                7.62 ns/op     4196.92 MB/s
+BenchmarkRowBasedFilterIntLessThanConst-8               200000000                7.85 ns/op     4075.18 MB/s
+BenchmarkRowBatchBasedFilterIntLessThanConst-8            300000              4394 ns/op        7456.14 MB/s
 ```
 
-Even though it's hard coded, the tuple-at-a-time model can't compare in
-throughput to the equivalent column vector model, clocking in at between 5 and
-6 times as slow depending on what computer I run the benchmarks on.
+Even though it's hard coded, the row-based model can't compare in
+throughput to the equivalent column vector model, even when batched, clocking
+in at between 2 and 3 times as slow depending on what computer I run the
+benchmarks on.
 
 ----
 
