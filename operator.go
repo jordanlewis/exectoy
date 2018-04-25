@@ -35,11 +35,6 @@ type TupleSource interface {
 	NextTuple() tuple
 }
 
-// TupleSource returns a batch of tuples on each call to NextTuple.
-type TupleBatchSource interface {
-	NextTupleBatch() []tuple
-}
-
 type repeatableBatchSource struct {
 	numOutputCols int
 	internalBatch batch
@@ -64,35 +59,6 @@ func (s *repeatableBatchSource) Init() {
 	for i := range s.internalBatch {
 		s.internalBatch[i] = column(b[i*batchRowLen : (i+1)*batchRowLen])
 	}
-}
-
-type repeatableTupleSource struct {
-	t tuple
-}
-
-var _ TupleSource = &repeatableTupleSource{}
-
-func (s *repeatableTupleSource) NextTuple() tuple {
-	return s.t
-}
-
-type repeatableTupleBatchSource struct {
-	numOutputCols int
-	internalBatch []tuple
-}
-
-var _ TupleBatchSource = &repeatableTupleBatchSource{}
-
-func (s *repeatableTupleBatchSource) Init() {
-	b := make([]int, s.numOutputCols*batchRowLen)
-	s.internalBatch = make([]tuple, batchRowLen)
-	for i := range s.internalBatch {
-		s.internalBatch[i] = tuple(b[i*s.numOutputCols : (i+1)*s.numOutputCols])
-	}
-}
-
-func (s *repeatableTupleBatchSource) NextTupleBatch() []tuple {
-	return s.internalBatch
 }
 
 /*
