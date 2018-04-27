@@ -1,6 +1,7 @@
 package exectoy
 
-type MergeJoinOp struct {
+/*
+type mergeJoinIntIntOp struct {
 	left  ExecOp
 	right ExecOp
 
@@ -8,12 +9,27 @@ type MergeJoinOp struct {
 	rightColIdxs []int
 }
 
-func (m *MergeJoinOp) Init() {
-	m.left.Init()
-	m.right.Init()
+func (m *mergeJoinIntIntOp) Init() {
 }
 
-func (m *MergeJoinOp) Next() dataFlow {
+func (m *mergeJoinIntIntOp) Next() dataFlow {
+	leftFlow := left.Next()
+	rightFlow := left.Next()
+
+}
+
+type SortedIntGroupOp struct {
+	right ExecOp
+
+	colIdx      int
+	groupColIdx int
+}
+
+func (m *SortedIntGroupOp) Init() {
+}
+
+func (m *SortedIntGroupOp) Next() dataFlow {
 	leftFlow := left.Next()
 	rightFlow := left.Next()
 }
+*/

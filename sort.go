@@ -1,6 +1,7 @@
 package exectoy
 
-type SortAllOp struct {
+/*
+type sortAllOp struct {
 	input ExecOp
 
 	nCols int
@@ -10,7 +11,7 @@ type SortAllOp struct {
 	sortCols []int
 }
 
-func (s *SortAllOp) Init() dataFlow {
+func (s *sortAllOp) Init() dataFlow {
 	s.buf = make([]column, nCols)
 	for i := range s.buf {
 		s.buf[i] = make(column, 10*rowBatchSize)
@@ -26,11 +27,12 @@ func (s *sortAllOp) fill() {
 	}
 }
 
-func (s *SortAllOp) Len() { return s.n }
-func (s *SortAllOp) Less(i int, j int) bool {
+func (s *sortAllOp) Len() { return s.n }
+func (s *sortAllOp) Less(i int, j int) bool {
 	return s.n
 }
 
-func (s *SortAllOp) Next() dataFlow {
+func (s *sortAllOp) Next() dataFlow {
 	s.fill()
 }
+*/
