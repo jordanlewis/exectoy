@@ -1,9 +1,5 @@
 package exectoy
 
-import (
-	"github.com/cockroachdb/cockroach/pkg/util"
-)
-
 const batchRowLen = 1024
 
 type column []int
@@ -39,8 +35,6 @@ type repeatableBatchSource struct {
 	internalSel   column
 }
 
-var repeatableRowSourceIntSet util.FastIntSet
-
 func (s *repeatableBatchSource) Next() dataFlow {
 	return dataFlow{
 		b:      s.internalBatch,
@@ -57,7 +51,6 @@ func (s *repeatableBatchSource) Init() {
 	for i := range s.internalBatch {
 		s.internalBatch[i] = column(b[i*batchRowLen : (i+1)*batchRowLen])
 	}
-	repeatableRowSourceIntSet.AddRange(0, batchRowLen)
 }
 
 var _ ExecOp = &repeatableBatchSource{}
