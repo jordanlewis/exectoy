@@ -1,11 +1,11 @@
 package exectoy
 
-// sortedDistinctIntIntOp runs a distinct on the column in sortedDistinctCol,
+// sortedDistinctIntOp runs a distinct on the column in sortedDistinctCol,
 // writing the result to the int column in outputColIdx by or'ing the difference
 // between the current and last value in the column with what's already in the
 // output column. this has the effect of setting the output column to 0 when
 // the input is distinct.
-type sortedDistinctIntIntOp struct {
+type sortedDistinctIntOp struct {
 	input ExecOp
 
 	sortedDistinctCol int
@@ -21,11 +21,11 @@ type sortedDistinctIntIntOp struct {
 	lastVal int
 }
 
-func (p *sortedDistinctIntIntOp) Init() {
+func (p *sortedDistinctIntOp) Init() {
 	p.firstColToLookAt = 1
 }
 
-func (p *sortedDistinctIntIntOp) Next() dataFlow {
+func (p *sortedDistinctIntOp) Next() dataFlow {
 	flow := p.input.Next()
 	if flow.n == 0 {
 		return flow

@@ -88,7 +88,7 @@ func TestSortedDistinct(t *testing.T) {
 		var lastOp ExecOp
 		lastOp = zeroOp
 		for _, cIdx := range tc.distinctCols {
-			sdop := &sortedDistinctIntIntOp{
+			sdop := &sortedDistinctIntOp{
 				input:             lastOp,
 				sortedDistinctCol: cIdx,
 				outputColIdx:      tc.numCols,

@@ -168,14 +168,14 @@ func BenchmarkSortedDistinct(b *testing.B) {
 	}
 	zeroOp.Init()
 
-	sdop := &sortedDistinctIntIntOp{
+	sdop := &sortedDistinctIntOp{
 		sortedDistinctCol: 1,
 		outputColIdx:      4,
 		input:             zeroOp,
 	}
 	sdop.Init()
 
-	sdop = &sortedDistinctIntIntOp{
+	sdop = &sortedDistinctIntOp{
 		sortedDistinctCol: 2,
 		outputColIdx:      4,
 		input:             sdop,

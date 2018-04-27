@@ -1,15 +1,18 @@
 package exectoy
 
-/*
 type mergeJoinIntIntOp struct {
 	left  ExecOp
 	right ExecOp
 
-	leftColIdxs  []int
-	rightColIdxs []int
+	leftEqColIdx  int
+	rightEqColIdx int
+
+	nOutputCols int
+	b           batch
 }
 
 func (m *mergeJoinIntIntOp) Init() {
+	m.b = make(nOutputCols * rowBatchLen)
 }
 
 func (m *mergeJoinIntIntOp) Next() dataFlow {
@@ -18,18 +21,17 @@ func (m *mergeJoinIntIntOp) Next() dataFlow {
 
 }
 
-type SortedIntGroupOp struct {
+type sortedIntGroupOp struct {
 	right ExecOp
 
 	colIdx      int
 	groupColIdx int
 }
 
-func (m *SortedIntGroupOp) Init() {
+func (m *sortedIntGroupOp) Init() {
 }
 
-func (m *SortedIntGroupOp) Next() dataFlow {
+func (m *sortedIntGroupOp) Next() dataFlow {
 	leftFlow := left.Next()
 	rightFlow := left.Next()
 }
-*/
