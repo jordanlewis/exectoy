@@ -4,6 +4,8 @@ package exectoy
 // "direct" aggregation where group keys map to array indexes
 // hash aggregation
 type aggrOp struct {
+	input ExecOp
+
 	funcs []aggrFunc
 
 	accs []aggrMap
@@ -24,6 +26,8 @@ type aggrMap map[int]aggrAcc
 type aggrAcc interface{}
 
 type aggrSumIntOp struct {
+	input ExecOp
+
 	colIdx int
 
 	acc int
@@ -31,7 +35,8 @@ type aggrSumIntOp struct {
 
 func (aggrSumIntOp) Init() {}
 
-func (a *aggrSumIntOp) Next(flow dataFlow) dataFlow {
+func (a *aggrSumIntOp) Next() dataFlow {
+	flow := a.input.Next()
 	if flow.n == 0 {
 		return flow
 	}

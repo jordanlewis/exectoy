@@ -24,106 +24,88 @@ func randomizeTupleBatchSouce(s *repeatableTupleBatchSource) {
 }
 
 func BenchmarkFilterIntLessThanConstOperator(b *testing.B) {
-	source := &repeatableBatchSource{
-		numOutputCols: 4,
-	}
-	engine := Engine{
-		source: source,
-		pipeline: []ExecOp{
-			&selectLTIntIntConstOp{
-				constArg: 64,
-				col1Idx:  3,
-			},
-		},
-	}
-	engine.Init()
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
 
-	randomizeSource(source)
+	var fop selectLTIntIntConstOp
+	fop.input = &source
+	fop.constArg = 64
+	fop.col1Idx = 3
+	fop.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
 
 	for i := 0; i < b.N; i++ {
-		engine.Next()
+		fop.Next()
 	}
 }
 
 func BenchmarkProjPlusIntIntConst(b *testing.B) {
-	source := &repeatableBatchSource{
-		numOutputCols: 4,
-	}
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
 
-	engine := Engine{
-		source: source,
-		pipeline: []ExecOp{
-			&projPlusIntIntConst{
-				intIdx:    2,
-				constArg:  5,
-				outputIdx: 3,
-			},
-		},
-	}
-	engine.Init()
-	randomizeSource(source)
+	var rop projPlusIntIntConst
+	rop.input = &source
+	rop.intIdx = 2
+	rop.constArg = 5
+	rop.outputIdx = 3
+	rop.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
 
 	for i := 0; i < b.N; i++ {
-		engine.Next()
+		rop.Next()
 	}
 }
 
 func BenchmarkProjPlusIntInt(b *testing.B) {
-	source := &repeatableBatchSource{
-		numOutputCols: 4,
-	}
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
 
-	engine := Engine{
-		source: source,
-		pipeline: []ExecOp{
-			&projPlusIntInt{
-				int1Idx:   2,
-				int2Idx:   3,
-				outputIdx: 3,
-			},
-		},
-	}
-	engine.Init()
-	randomizeSource(source)
+	var rop projPlusIntInt
+	rop.input = &source
+	rop.int1Idx = 2
+	rop.int2Idx = 3
+	rop.outputIdx = 3
+	rop.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
 
 	for i := 0; i < b.N; i++ {
-		engine.Next()
+		rop.Next()
 	}
 }
 
 func BenchmarkRenderChain(b *testing.B) {
-	source := &repeatableBatchSource{
-		numOutputCols: 4,
-	}
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
 
-	engine := Engine{
-		source: source,
-		pipeline: []ExecOp{
-			&projPlusIntInt{
-				int1Idx:   2,
-				int2Idx:   3,
-				outputIdx: 3,
-			},
-			&projPlusIntInt{
-				int1Idx:   2,
-				int2Idx:   3,
-				outputIdx: 3,
-			},
-		},
-	}
-	engine.Init()
-	randomizeSource(source)
+	var rop projPlusIntInt
+	rop.input = &source
+	rop.int1Idx = 2
+	rop.int2Idx = 3
+	rop.outputIdx = 3
+	rop.Init()
+
+	var rop2 projPlusIntInt
+	rop2.input = &rop
+	rop2.int1Idx = 2
+	rop2.int2Idx = 3
+	rop2.outputIdx = 3
+	rop2.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
 
 	for i := 0; i < b.N; i++ {
-		engine.Next()
+		rop2.Next()
 	}
 }
 
@@ -131,32 +113,32 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 	// this benchmarks a query like:
 	// SELECT o FROM t WHERE n + 1 > m
 	// on a table t [n, m, o, p]
-	source := &repeatableBatchSource{
-		numOutputCols: 4,
-	}
 
-	engine := Engine{
-		source: source,
-		pipeline: []ExecOp{
-			// first project n -> n+1
-			&projPlusIntIntConst{
-				intIdx:    0,
-				constArg:  1,
-				outputIdx: 0,
-			},
-			// then select (n+1) > m
-			&selectLTIntIntOp{
-				col1Idx: 1,
-				col2Idx: 0,
-			},
-		},
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
+
+	// first project n -> n+1
+	projOp := projPlusIntIntConst{
+		input:     &source,
+		intIdx:    0,
+		constArg:  1,
+		outputIdx: 0,
 	}
-	engine.Init()
-	randomizeSource(source)
+	projOp.Init()
+
+	// then select (n+1) > m
+	selOp := selectLTIntIntOp{
+		input:   &projOp,
+		col1Idx: 1,
+		col2Idx: 0,
+	}
+	selOp.Init()
 
 	b.SetBytes(int64(8 * source.numOutputCols * batchRowLen))
 	for i := 0; i < b.N; i++ {
-		engine.Next()
+		selOp.Next()
 	}
 
 	/*
@@ -174,23 +156,18 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 }
 
 func BenchmarkSortedDistinct(b *testing.B) {
-	source := &repeatableBatchSource{
-		numOutputCols: 4,
-	}
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
 
-	engine := Engine{
-		source: source,
-		pipeline: []ExecOp{
-			&sortedDistinctOp{
-				sortedDistinctCols: []int{1, 2},
-			},
-		},
-	}
-	engine.Init()
-	randomizeSource(source)
+	var sdop sortedDistinctOperator
+	sdop.sortedDistinctCols = []int{1, 2}
+	sdop.input = &source
+	sdop.Init()
 
 	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
 	for i := 0; i < b.N; i++ {
-		engine.Next()
+		sdop.Next()
 	}
 }

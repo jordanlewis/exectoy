@@ -4,12 +4,15 @@ package exectoy
 // TODO(jordan) these are really "projections" where the operator is a hash
 // function...
 type hashIntOp struct {
+	input ExecOp
+
 	colIdx     int
 	hashColIdx int
 }
 
 func (hashIntOp) Init() {}
-func (h hashIntOp) Next(flow dataFlow) dataFlow {
+func (h hashIntOp) Next() dataFlow {
+	flow := h.input.Next()
 	if flow.n == 0 {
 		return flow
 	}
@@ -33,12 +36,15 @@ func (h hashIntOp) Next(flow dataFlow) dataFlow {
 // Algorithm from Architecture-Conscious Hashing
 // http://www.cs.cmu.edu/~./damon2006/pdf/zukowski06archconscioushashing.pdf
 type rehashIntOp struct {
+	input ExecOp
+
 	colIdx     int
 	hashColIdx int
 }
 
 func (rehashIntOp) Init() {}
-func (h rehashIntOp) Next(flow dataFlow) dataFlow {
+func (h rehashIntOp) Next() dataFlow {
+	flow := h.input.Next()
 	if flow.n == 0 {
 		return flow
 	}
