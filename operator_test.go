@@ -75,18 +75,35 @@ func TestSortedDistinct(t *testing.T) {
 
 		columnarizeOp := &columnarizeOp{
 			input:   tupleSource,
-			numCols: tc.numCols,
+			numCols: tc.numCols + 1,
 		}
 		columnarizeOp.Init()
 
-		sdop := &sortedDistinctOperator{
-			input:              columnarizeOp,
-			sortedDistinctCols: tc.distinctCols,
+		zeroOp := &zeroIntOp{
+			input:  columnarizeOp,
+			colIdx: tc.numCols,
 		}
-		sdop.Init()
+		zeroOp.Init()
+
+		var lastOp ExecOp
+		lastOp = zeroOp
+		for _, cIdx := range tc.distinctCols {
+			sdop := &sortedDistinctIntIntOp{
+				input:             lastOp,
+				sortedDistinctCol: cIdx,
+				outputColIdx:      tc.numCols,
+			}
+			sdop.Init()
+			lastOp = sdop
+		}
+
+		finalizer := &sortedDistinctFinalizerOp{
+			input:        lastOp,
+			outputColIdx: tc.numCols,
+		}
 
 		mop := &materializeOp{
-			input: sdop,
+			input: finalizer,
 			cols:  []int{0, 1, 2, 3},
 		}
 		mop.Init()

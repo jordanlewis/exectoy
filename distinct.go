@@ -1,95 +1,105 @@
 package exectoy
 
-// sortedDistinct runs a distinct on the columns in sortedDistinctCols.
-// Currently it's not even as RISC-y as it could be - it operators on all
-// of the sortedDistinctCols at once. This is a weakness because it can't be
-// made type-agnostic.
-//
-// What should really happen is that "sorted distinct" on n columns should be
-// implemented by n+1 operators. The first n operators do sorted distinct on a
-// single column, or-ing their distinct information with an output column like
-// the operator does today. The final operator turns the output column into a
-// selection vector.
-//
-// This would allow sorted distinct to operate on arbitrary types.
-type sortedDistinctOperator struct {
+// sortedDistinctIntIntOp runs a distinct on the column in sortedDistinctCol,
+// writing the result to the int column in outputColIdx by or'ing the difference
+// between the current and last value in the column with what's already in the
+// output column. this has the effect of setting the output column to 0 when
+// the input is distinct.
+type sortedDistinctIntIntOp struct {
 	input ExecOp
 
-	sortedDistinctCols []int
+	sortedDistinctCol int
+	outputColIdx      int
 
-	cols      []column
-	lastVal   tuple
-	outputVec []int
+	// set to true if this is the first column in a logical distinct.
+	firstColInDistinct bool
+
+	// Starts at 1, flips to 0.
+	firstColToLookAt int
+
+	col     column
+	lastVal int
 }
 
-var zeroVec = make([]int, batchRowLen)
-
-func (p *sortedDistinctOperator) Init() {
-	p.cols = make([]column, len(p.sortedDistinctCols))
-	p.lastVal = make(tuple, len(p.sortedDistinctCols))
-	p.outputVec = make([]int, batchRowLen)
+func (p *sortedDistinctIntIntOp) Init() {
+	p.firstColToLookAt = 1
 }
 
-func (p *sortedDistinctOperator) Next() dataFlow {
-	copy(p.outputVec, zeroVec)
-	// outputBitmap contains row indexes that we will output
+func (p *sortedDistinctIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 	if flow.n == 0 {
 		return flow
 	}
-	for i, c := range p.sortedDistinctCols {
-		p.cols[i] = flow.b[c]
+	p.col = flow.b[p.sortedDistinctCol]
+	outputCol := flow.b[p.outputColIdx]
+
+	// we always output the first row.
+	for i := 0; i < p.firstColToLookAt; i++ {
+		p.lastVal = p.col[0]
+		outputCol[i] = 1
 	}
-	// TODO(jordan) p.lastVal is wrong in the very first invocation.
 
 	if flow.useSel {
-		for cIdx, col := range p.cols {
-			lastVal := p.lastVal[cIdx]
-			for s := 0; s < flow.n; s++ {
-				i := flow.sel[s]
-				/* Morally, we're doing this, but we replace the control dep with a data
-				 * dep.
-				if col[i] != lastVal {
-					p.outputVec[i] = true
-					lastVal = col[i]
-				}
-				*/
-				p.outputVec[i] |= (col[i] - lastVal)
+		for s := p.firstColToLookAt; s < flow.n; s++ {
+			i := flow.sel[s]
+			/* Morally, we're doing this, but we replace the control dep with a data
+			 * dep.
+			if col[i] != lastVal {
+				outputCol[i] = true
 				lastVal = col[i]
 			}
-			p.lastVal[cIdx] = lastVal
+			*/
+			outputCol[i] |= (p.col[i] - p.lastVal)
+			p.lastVal = p.col[i]
 		}
 	} else {
-		for cIdx, col := range p.cols {
-			lastVal := p.lastVal[cIdx]
-			for i := 0; i < flow.n; i++ {
-				/* Morally, we're doing this, but we replace the control dep with a data
-				 * dep.
-				if col[i] != lastVal {
-					p.outputVec[i] = true
-					lastVal = col[i]
-				}
-				*/
-				p.outputVec[i] |= (col[i] - lastVal)
+		for i := p.firstColToLookAt; i < flow.n; i++ {
+			/* Morally, we're doing this, but we replace the control dep with a data
+			 * dep.
+			if col[i] != lastVal {
+				outputCol[i] = true
 				lastVal = col[i]
 			}
-			p.lastVal[cIdx] = lastVal
+			*/
+			outputCol[i] |= (p.col[i] - p.lastVal)
+			p.lastVal = p.col[i]
 		}
 	}
+
+	p.firstColToLookAt = 0
+
+	return flow
+}
+
+// This finalizer op transforms the vector in outputColIdx to the sel vector,
+// by adding an index to sel if it's equal to 0.
+type sortedDistinctFinalizerOp struct {
+	input ExecOp
+
+	outputColIdx int
+}
+
+func (p sortedDistinctFinalizerOp) Next() dataFlow {
+	flow := p.input.Next()
+	if flow.n == 0 {
+		return flow
+	}
+
+	outputCol := flow.b[p.outputColIdx]
 
 	// convert outputVec to sel
 	idx := 0
 	if flow.useSel {
 		max := flow.sel[flow.n-1]
 		for i := 0; i < max; i++ {
-			if p.outputVec[i] != 0 {
+			if outputCol[i] != 0 {
 				flow.sel[idx] = i
 				idx++
 			}
 		}
 	} else {
 		for i := 0; i < flow.n; i++ {
-			if p.outputVec[i] != 0 {
+			if outputCol[i] != 0 {
 				flow.sel[idx] = i
 				idx++
 			}
@@ -100,3 +110,5 @@ func (p *sortedDistinctOperator) Next() dataFlow {
 	flow.n = idx
 	return flow
 }
+
+func (p sortedDistinctFinalizerOp) Init() {}

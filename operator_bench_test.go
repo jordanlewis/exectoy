@@ -156,17 +156,34 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 }
 
 func BenchmarkSortedDistinct(b *testing.B) {
-	var source repeatableBatchSource
-	source.numOutputCols = 4
+	source := &repeatableBatchSource{
+		numOutputCols: 5,
+	}
 	source.Init()
-	randomizeSource(&source)
+	randomizeSource(source)
 
-	var sdop sortedDistinctOperator
-	sdop.sortedDistinctCols = []int{1, 2}
-	sdop.input = &source
+	zeroOp := &zeroIntOp{
+		input:  source,
+		colIdx: 4,
+	}
+	zeroOp.Init()
+
+	sdop := &sortedDistinctIntIntOp{
+		sortedDistinctCol: 1,
+		outputColIdx:      4,
+		input:             zeroOp,
+	}
 	sdop.Init()
 
-	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
+	sdop = &sortedDistinctIntIntOp{
+		sortedDistinctCol: 2,
+		outputColIdx:      4,
+		input:             sdop,
+	}
+	sdop.Init()
+
+	// don't count the artificial zeroOp'd column in the throughput
+	b.SetBytes(int64(8 * batchRowLen * (source.numOutputCols - 1)))
 	for i := 0; i < b.N; i++ {
 		sdop.Next()
 	}
