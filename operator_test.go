@@ -121,3 +121,86 @@ func TestSortedDistinct(t *testing.T) {
 		}
 	}
 }
+
+func TestMergeJoin(t *testing.T) {
+	tcs := []struct {
+		leftEqColIdx  int
+		rightEqColIdx int
+		leftNCols     int
+		rightNCols    int
+		leftCols      []int
+		rightCols     []int
+		leftTuples    []tuple
+		rightTuples   []tuple
+		expected      []tuple
+	}{
+		{
+			leftEqColIdx:  0,
+			rightEqColIdx: 1,
+			leftNCols:     4,
+			rightNCols:    4,
+			leftTuples: []tuple{
+				tuple{1, 2, 3, 4},
+				tuple{5, 2, 3, 5},
+			},
+			rightTuples: []tuple{
+				tuple{1, 5, 3, 4},
+				tuple{1, 6, 3, 5},
+			},
+			leftCols:  []int{0, 1},
+			rightCols: []int{1, 2},
+			expected: []tuple{
+				tuple{5, 2, 5, 3},
+			},
+		},
+	}
+
+	for _, tc := range tcs {
+		leftSource := &staticTupleSource{
+			tuples: tc.leftTuples,
+		}
+
+		lColOp := &columnarizeOp{
+			input:   leftSource,
+			numCols: tc.leftNCols,
+		}
+		lColOp.Init()
+
+		rightSource := &staticTupleSource{
+			tuples: tc.rightTuples,
+		}
+		rColOp := &columnarizeOp{
+			input:   rightSource,
+			numCols: tc.rightNCols,
+		}
+		rColOp.Init()
+
+		mj := &mergeJoinIntIntOp{
+			left:          lColOp,
+			right:         rColOp,
+			leftEqColIdx:  tc.leftEqColIdx,
+			rightEqColIdx: tc.rightEqColIdx,
+			leftCols:      tc.leftCols,
+			rightCols:     tc.rightCols,
+		}
+		mj.Init()
+
+		mop := &materializeOp{
+			input: mj,
+			cols:  []int{0, 1, 2, 3},
+		}
+		mop.Init()
+
+		var actual []tuple
+		for {
+			tuple := mop.NextTuple()
+			if tuple == nil {
+				break
+			}
+			actual = append(actual, tuple)
+		}
+		if !reflect.DeepEqual(tc.expected, actual) {
+			t.Errorf("expected %v, got %v", tc.expected, actual)
+		}
+	}
+}
