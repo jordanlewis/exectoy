@@ -14,6 +14,8 @@ type mergeJoinIntIntOp struct {
 	leftBatchBuf  batch
 	rightBatchBuf batch
 
+	leftBatchIdx int
+
 	nOutputCols int
 	d           dataFlow
 }
@@ -26,6 +28,9 @@ func (m *mergeJoinIntIntOp) Init() {
 }
 
 func (m *mergeJoinIntIntOp) Next() dataFlow {
+	// Check for buffered output.
+
+
 	leftFlow := m.left.Next()
 	rightFlow := m.left.Next()
 
@@ -54,8 +59,19 @@ func (m *mergeJoinIntIntOp) Next() dataFlow {
 				// ran out of rows on the left.
 				return dataFlow{}
 			}
-		} else { // leftVal != rightVal
+		} else { // leftVal == rightVal
 			// buffer rows on both sides.
+			leftFlow = m.bufferMatchGroup(leftVal, leftFlow, m.leftEqColIdx, m.left, leftIdx, m.leftCols, m.leftBatchBuf)
+			rightFlow = m.bufferMatchGroup(rightVal, rightFlow, m.rightEqColIdx, m.right, rightIdx, m.rightCols, m.rightBatchBuf)
+
+			// cartesian product the buffers to the output.
+			m.leftBatchIdx = 0
+			avail := batchRowLen - m.d.n
+			repeats := rightFlow.n
+			// copy each left column `repeats` times to the output.
+			for i := m.d.n; i < batchRowLen; i++ {
+			}
+			leftFlow.n = 
 
 		}
 	}
@@ -73,8 +89,12 @@ func (m *mergeJoinIntIntOp) bufferMatchGroup(val int, flow dataFlow, colIdx int,
 			}
 			// TODO(jordan) fail. this should be col-oriented.
 			// It's hard because this whole process can span batch boundaries.
+			// The algorithm should be:
+			// for each col:
+			//   add value to buffer until group's over or batch ends.
+			// if batch ended early, repeat.
 			for i := range cols {
-				batchBuf[i][matchIdx-startIdx] = flow.b[i][matchIdx]
+				batchBuf[i].(intColumn)[matchIdx-startIdx] = flow.b[i].(intColumn)[matchIdx]
 			}
 		}
 		// If we got here, we made it to the end of the batch. We must retrieve the
