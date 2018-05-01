@@ -19,15 +19,15 @@ type columnarizeOp struct {
 
 	numCols       int
 	internalBatch batch
-	internalSel   column
+	internalSel   intColumn
 }
 
 func (c *columnarizeOp) Init() {
 	b := make([]int, c.numCols*batchRowLen)
 	c.internalBatch = make(batch, c.numCols)
-	c.internalSel = make(column, batchRowLen)
+	c.internalSel = make(intColumn, batchRowLen)
 	for i := range c.internalBatch {
-		c.internalBatch[i] = column(b[i*batchRowLen : (i+1)*batchRowLen])
+		c.internalBatch[i] = intColumn(b[i*batchRowLen : (i+1)*batchRowLen])
 	}
 }
 
@@ -43,7 +43,7 @@ func (c columnarizeOp) Next() dataFlow {
 			break
 		}
 		for i := range t {
-			c.internalBatch[i][d.n] = t[i]
+			c.internalBatch[i].(intColumn)[d.n] = t[i]
 		}
 		d.n++
 	}

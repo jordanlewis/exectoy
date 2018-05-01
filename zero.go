@@ -1,6 +1,6 @@
 package exectoy
 
-var zeroVec = make(column, batchRowLen)
+var zeroVec = make(intColumn, batchRowLen)
 
 // This operator zeroes a column.
 type zeroIntOp struct {
@@ -15,7 +15,7 @@ func (z zeroIntOp) Next() dataFlow {
 		return flow
 	}
 
-	copy(flow.b[z.colIdx], zeroVec)
+	copy(flow.b[z.colIdx].(intColumn), zeroVec)
 	return flow
 }
 

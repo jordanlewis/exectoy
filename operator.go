@@ -2,9 +2,11 @@ package exectoy
 
 const batchRowLen = 1024
 
-type column []int
+type column interface{}
 type batch []column
 type tuple []int
+
+type intColumn []int
 
 // dataFlow is the batch format passed around by operators.
 type dataFlow struct {
@@ -15,7 +17,7 @@ type dataFlow struct {
 	useSel bool
 	// if useSel is true, a selection vector from upstream. a selection vector is
 	// a list of selected column indexes in this dataFlow's columns.
-	sel column
+	sel intColumn
 }
 
 // ExecOp is an exectoy operator.
@@ -32,7 +34,7 @@ type TupleSource interface {
 type repeatableBatchSource struct {
 	numOutputCols int
 	internalBatch batch
-	internalSel   column
+	internalSel   intColumn
 }
 
 func (s *repeatableBatchSource) Next() dataFlow {
@@ -47,9 +49,9 @@ func (s *repeatableBatchSource) Next() dataFlow {
 func (s *repeatableBatchSource) Init() {
 	b := make([]int, s.numOutputCols*batchRowLen)
 	s.internalBatch = make(batch, s.numOutputCols)
-	s.internalSel = make(column, batchRowLen)
+	s.internalSel = make(intColumn, batchRowLen)
 	for i := range s.internalBatch {
-		s.internalBatch[i] = column(b[i*batchRowLen : (i+1)*batchRowLen])
+		s.internalBatch[i] = intColumn(b[i*batchRowLen : (i+1)*batchRowLen])
 	}
 }
 

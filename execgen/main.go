@@ -52,8 +52,8 @@ type proj{{.Name}}IntIntConst struct {
 func (p *proj{{.Name}}IntIntConst) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	intCol := flow.b[p.intIdx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	intCol := flow.b[p.intIdx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -81,9 +81,9 @@ type proj{{.Name}}IntInt struct {
 func (p *proj{{.Name}}IntInt) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	col1 := flow.b[p.int1Idx]
-	col2 := flow.b[p.int2Idx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	col1 := flow.b[p.int1Idx].(intColumn)
+	col2 := flow.b[p.int2Idx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]

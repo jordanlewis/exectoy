@@ -15,8 +15,8 @@ type projPlusIntIntConst struct {
 func (p *projPlusIntIntConst) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	intCol := flow.b[p.intIdx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	intCol := flow.b[p.intIdx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -44,9 +44,9 @@ type projPlusIntInt struct {
 func (p *projPlusIntInt) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	col1 := flow.b[p.int1Idx]
-	col2 := flow.b[p.int2Idx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	col1 := flow.b[p.int1Idx].(intColumn)
+	col2 := flow.b[p.int2Idx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -74,8 +74,8 @@ type projMinusIntIntConst struct {
 func (p *projMinusIntIntConst) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	intCol := flow.b[p.intIdx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	intCol := flow.b[p.intIdx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -103,9 +103,9 @@ type projMinusIntInt struct {
 func (p *projMinusIntInt) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	col1 := flow.b[p.int1Idx]
-	col2 := flow.b[p.int2Idx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	col1 := flow.b[p.int1Idx].(intColumn)
+	col2 := flow.b[p.int2Idx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -133,8 +133,8 @@ type projDivIntIntConst struct {
 func (p *projDivIntIntConst) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	intCol := flow.b[p.intIdx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	intCol := flow.b[p.intIdx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -162,9 +162,9 @@ type projDivIntInt struct {
 func (p *projDivIntInt) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	col1 := flow.b[p.int1Idx]
-	col2 := flow.b[p.int2Idx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	col1 := flow.b[p.int1Idx].(intColumn)
+	col2 := flow.b[p.int2Idx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -192,8 +192,8 @@ type projMulIntIntConst struct {
 func (p *projMulIntIntConst) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	intCol := flow.b[p.intIdx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	intCol := flow.b[p.intIdx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -221,9 +221,9 @@ type projMulIntInt struct {
 func (p *projMulIntInt) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx]
-	col1 := flow.b[p.int1Idx]
-	col2 := flow.b[p.int2Idx]
+	projCol := flow.b[p.outputIdx].(intColumn)
+	col1 := flow.b[p.int1Idx].(intColumn)
+	col2 := flow.b[p.int2Idx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]

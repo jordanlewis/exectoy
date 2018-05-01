@@ -17,7 +17,7 @@ func (p *selectLTIntIntConstOp) Init() {}
 func (p *selectLTIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx]
+	col1 := flow.b[p.col1Idx].(intColumn)
 	idx := 0
 	// hard to see how to eliminate this if.
 	if flow.useSel {
@@ -53,8 +53,8 @@ func (p *selectLTIntIntOp) Init() {}
 func (p *selectLTIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx]
-	col2 := flow.b[p.col2Idx]
+	col1 := flow.b[p.col1Idx].(intColumn)
+	col2 := flow.b[p.col2Idx].(intColumn)
 
 	idx := 0
 	if flow.useSel {

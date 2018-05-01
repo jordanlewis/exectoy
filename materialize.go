@@ -30,16 +30,18 @@ func (t *materializeOp) NextTuple() tuple {
 		t.rows = t.rowsBuf
 		if flow.useSel {
 			for outIdx, cIdx := range t.cols {
+				col := flow.b[cIdx].(intColumn)
 				for s := 0; s < flow.n; s++ {
 					i := flow.sel[s]
-					n := flow.b[cIdx][i]
+					n := col[i]
 					t.rows[s][outIdx] = n
 				}
 			}
 		} else {
 			for outIdx, cIdx := range t.cols {
+				col := flow.b[cIdx].(intColumn)
 				for i := 0; i < flow.n; i++ {
-					t.rows[i][outIdx] = flow.b[cIdx][i]
+					t.rows[i][outIdx] = col[i]
 				}
 			}
 		}

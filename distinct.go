@@ -17,7 +17,7 @@ type sortedDistinctIntOp struct {
 	// Starts at 1, flips to 0.
 	firstColToLookAt int
 
-	col     column
+	col     intColumn
 	lastVal int
 }
 
@@ -30,8 +30,8 @@ func (p *sortedDistinctIntOp) Next() dataFlow {
 	if flow.n == 0 {
 		return flow
 	}
-	p.col = flow.b[p.sortedDistinctCol]
-	outputCol := flow.b[p.outputColIdx]
+	p.col = flow.b[p.sortedDistinctCol].(intColumn)
+	outputCol := flow.b[p.outputColIdx].(intColumn)
 
 	// we always output the first row.
 	for i := 0; i < p.firstColToLookAt; i++ {
@@ -85,7 +85,7 @@ func (p sortedDistinctFinalizerOp) Next() dataFlow {
 		return flow
 	}
 
-	outputCol := flow.b[p.outputColIdx]
+	outputCol := flow.b[p.outputColIdx].(intColumn)
 
 	// convert outputVec to sel
 	idx := 0

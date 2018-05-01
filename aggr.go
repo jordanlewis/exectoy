@@ -41,7 +41,7 @@ func (a *aggrSumIntOp) Next() dataFlow {
 		return flow
 	}
 
-	col := flow.b[a.colIdx]
+	col := flow.b[a.colIdx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]

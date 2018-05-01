@@ -73,11 +73,11 @@ func BenchmarkRowBasedFilterIntLessThanConst(b *testing.B) {
 
 type rowBatchBasedFilterIntLessThanConst struct {
 	input       TupleBatchSource
-	internalSel column
+	internalSel intColumn
 }
 
 func (r *rowBatchBasedFilterIntLessThanConst) Init() {
-	r.internalSel = make(column, batchRowLen)
+	r.internalSel = make(intColumn, batchRowLen)
 }
 
 func (r *rowBatchBasedFilterIntLessThanConst) NextTupleBatch() []tuple {

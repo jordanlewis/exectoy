@@ -17,8 +17,8 @@ func (h hashIntOp) Next() dataFlow {
 		return flow
 	}
 
-	col := flow.b[h.colIdx]
-	hashCol := flow.b[h.hashColIdx]
+	col := flow.b[h.colIdx].(intColumn)
+	hashCol := flow.b[h.hashColIdx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -49,8 +49,8 @@ func (h rehashIntOp) Next() dataFlow {
 		return flow
 	}
 
-	col := flow.b[h.colIdx]
-	hashCol := flow.b[h.hashColIdx]
+	col := flow.b[h.colIdx].(intColumn)
+	hashCol := flow.b[h.hashColIdx].(intColumn)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
