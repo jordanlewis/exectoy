@@ -6,30 +6,64 @@ import (
 	"text/template"
 )
 
+type typDef struct {
+	Name  string
+	GoTyp string
+	Ops   []opDef
+}
+
 type opDef struct {
 	Name  string
 	OpStr string
 }
 
 var input = struct {
-	Ops []opDef
+	Types []typDef
 }{
-	Ops: []opDef{
+	Types: []typDef{
 		{
-			Name:  "Plus",
-			OpStr: "+",
+			Name:  "Int",
+			GoTyp: "int",
+			Ops: []opDef{
+				{
+					Name:  "Plus",
+					OpStr: "+",
+				},
+				{
+					Name:  "Minus",
+					OpStr: "-",
+				},
+				{
+					Name:  "Div",
+					OpStr: "/",
+				},
+				{
+					Name:  "Mul",
+					OpStr: "*",
+				},
+			},
 		},
 		{
-			Name:  "Minus",
-			OpStr: "-",
-		},
-		{
-			Name:  "Div",
-			OpStr: "/",
-		},
-		{
-			Name:  "Mul",
-			OpStr: "*",
+			Name:  "Double",
+			GoTyp: "float64",
+			Ops: []opDef{
+				{
+					Name:  "Plus",
+					OpStr: "+",
+				},
+				{
+					Name:  "Minus",
+					OpStr: "-",
+				},
+				{
+					Name:  "Div",
+					OpStr: "/",
+				},
+				{
+					Name:  "Mul",
+					OpStr: "*",
+				},
+			},
 		},
 	},
 }
@@ -39,51 +73,52 @@ func main() {
 
 package exectoy
 
+{{range $typ := .Types}}
 {{range .Ops}}
-type proj{{.Name}}IntIntConst struct {
+type proj{{.Name}}{{$typ.Name}}{{$typ.Name}}Const struct {
 	input ExecOp
 
-	intIdx   int
-	constArg int
+	colIdx   int
+	constArg {{$typ.GoTyp}}
 
 	outputIdx int
 }
 
-func (p *proj{{.Name}}IntIntConst) Next() dataFlow {
+func (p *proj{{.Name}}{{$typ.Name}}{{$typ.Name}}Const) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	intCol := flow.b[p.intIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].({{$typ.GoTyp}}Column)
+	col := flow.b[p.colIdx].({{$typ.GoTyp}}Column)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
-			projCol[i] = intCol[i] {{.OpStr}} p.constArg
+			projCol[i] = col[i] {{.OpStr}} p.constArg
 		}
 	} else {
 		for i := 0; i < flow.n; i++ {
-			projCol[i] = intCol[i] {{.OpStr}} p.constArg
+			projCol[i] = col[i] {{.OpStr}} p.constArg
 		}
 	}
 	return flow
 }
 
-func (p proj{{.Name}}IntIntConst) Init() {}
+func (p proj{{.Name}}{{$typ.Name}}{{$typ.Name}}Const) Init() {}
 
-type proj{{.Name}}IntInt struct {
+type proj{{.Name}}{{$typ.Name}}{{$typ.Name}} struct {
 	input ExecOp
 
-	int1Idx int
-	int2Idx int
+	col1Idx int
+	col2Idx int
 
 	outputIdx int
 }
 
-func (p *proj{{.Name}}IntInt) Next() dataFlow {
+func (p *proj{{.Name}}{{$typ.Name}}{{$typ.Name}}) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	col1 := flow.b[p.int1Idx].(intColumn)
-	col2 := flow.b[p.int2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].({{$typ.GoTyp}}Column)
+	col1 := flow.b[p.col1Idx].({{$typ.GoTyp}}Column)
+	col2 := flow.b[p.col2Idx].({{$typ.GoTyp}}Column)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -97,7 +132,8 @@ func (p *proj{{.Name}}IntInt) Next() dataFlow {
 	return flow
 }
 
-func (p proj{{.Name}}IntInt) Init() {}
+func (p proj{{.Name}}{{$typ.Name}}{{$typ.Name}}) Init() {}
+{{end}}
 {{end}}
 `)
 	if err != nil {

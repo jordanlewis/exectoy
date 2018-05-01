@@ -7,6 +7,7 @@ type batch []column
 type tuple []int
 
 type intColumn []int
+type float64Column []float64
 
 // dataFlow is the batch format passed around by operators.
 type dataFlow struct {

@@ -50,7 +50,7 @@ func BenchmarkProjPlusIntIntConst(b *testing.B) {
 
 	var rop projPlusIntIntConst
 	rop.input = &source
-	rop.intIdx = 2
+	rop.colIdx = 2
 	rop.constArg = 5
 	rop.outputIdx = 3
 	rop.Init()
@@ -70,8 +70,8 @@ func BenchmarkProjPlusIntInt(b *testing.B) {
 
 	var rop projPlusIntInt
 	rop.input = &source
-	rop.int1Idx = 2
-	rop.int2Idx = 3
+	rop.col1Idx = 2
+	rop.col2Idx = 3
 	rop.outputIdx = 3
 	rop.Init()
 
@@ -90,15 +90,15 @@ func BenchmarkRenderChain(b *testing.B) {
 
 	var rop projPlusIntInt
 	rop.input = &source
-	rop.int1Idx = 2
-	rop.int2Idx = 3
+	rop.col1Idx = 2
+	rop.col2Idx = 3
 	rop.outputIdx = 3
 	rop.Init()
 
 	var rop2 projPlusIntInt
 	rop2.input = &rop
-	rop2.int1Idx = 2
-	rop2.int2Idx = 3
+	rop2.col1Idx = 2
+	rop2.col2Idx = 3
 	rop2.outputIdx = 3
 	rop2.Init()
 
@@ -122,7 +122,7 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 	// first project n -> n+1
 	projOp := projPlusIntIntConst{
 		input:     &source,
-		intIdx:    0,
+		colIdx:    0,
 		constArg:  1,
 		outputIdx: 0,
 	}
