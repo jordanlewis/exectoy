@@ -1,5 +1,10 @@
 package exectoy
 
+import (
+	"bytes"
+	"fmt"
+)
+
 const batchRowLen = 1024
 
 type column interface{}
@@ -19,6 +24,15 @@ type dataFlow struct {
 	// if useSel is true, a selection vector from upstream. a selection vector is
 	// a list of selected column indexes in this dataFlow's columns.
 	sel intColumn
+}
+
+func (d dataFlow) String() string {
+	var b bytes.Buffer
+	b.WriteString(fmt.Sprintf("%d ", d.n))
+	for i := range d.b {
+		b.WriteString(fmt.Sprintf("%v ", d.b[i].(intColumn)[:d.n]))
+	}
+	return b.String()
 }
 
 // ExecOp is an exectoy operator.

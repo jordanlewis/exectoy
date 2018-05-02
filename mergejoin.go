@@ -1,5 +1,7 @@
 package exectoy
 
+import "fmt"
+
 type mergeJoinIntIntOp struct {
 	left  ExecOp
 	right ExecOp
@@ -10,82 +12,171 @@ type mergeJoinIntIntOp struct {
 	leftCols  []int
 	rightCols []int
 
-	// used if a match group spans batch boundaries
+	leftFlow  dataFlow
+	rightFlow dataFlow
+
+	leftFlowIdx  int
+	rightFlowIdx int
+
 	leftBatchBuf  batch
 	rightBatchBuf batch
 
-	leftBatchIdx int
+	leftBatchN  int
+	rightBatchN int
 
-	nOutputCols int
-	d           dataFlow
+	leftBatchIdx  int
+	rightBatchIdx int
+
+	d dataFlow
 }
 
 func (m *mergeJoinIntIntOp) Init() {
-	m.d.b = make(batch, m.nOutputCols*batchRowLen)
+	nOutputCols := len(m.leftCols) + len(m.rightCols)
+	if nOutputCols == 0 {
+		panic("no output cols")
+	}
+	m.d.b = make(batch, nOutputCols)
+	for i := range m.d.b {
+		m.d.b[i] = make(intColumn, batchRowLen)
+	}
 
-	leftBatchBuf = make(batch, 0, len(leftCols)*batchRowLen)
-	rightBatchBuf = make(batch, 0, len(leftCols)*batchRowLen)
+	m.leftBatchBuf = make(batch, len(m.leftCols))
+	m.rightBatchBuf = make(batch, len(m.rightCols))
+
+	for i := range m.leftBatchBuf {
+		m.leftBatchBuf[i] = make(intColumn, 1)
+	}
+	for i := range m.rightBatchBuf {
+		m.rightBatchBuf[i] = make(intColumn, 1)
+	}
 }
 
 func (m *mergeJoinIntIntOp) Next() dataFlow {
 	// Check for buffered output.
+	m.maybeOutput()
 
-
-	leftFlow := m.left.Next()
-	rightFlow := m.left.Next()
-
-	if leftFlow.n == 0 || leftFlow.n == 0 {
-		// && nothing left to output
-		return dataFlow{}
+	if m.leftFlow.n == 0 {
+		m.leftFlow = m.left.Next()
 	}
-	leftCol, rightCol := leftFlow.b[m.leftEqColIdx], rightFlow.b[m.rightEqColIdx]
-
-	leftIdx, rightIdx := 0, 0
+	if m.rightFlow.n == 0 {
+		m.rightFlow = m.right.Next()
+	}
+	if m.leftFlow.n == 0 && m.rightFlow.n == 0 {
+		ret := m.d
+		m.d.n = 0
+		return ret
+	}
+	leftCol, rightCol := m.leftFlow.b[m.leftEqColIdx], m.rightFlow.b[m.rightEqColIdx]
 
 	for {
 		// todo(jordan) deal with sel
-		leftVal, rightVal := leftCol[leftIdx], rightCol[rightIdx]
-		matchIdx := 0
+		leftVal, rightVal := leftCol.(intColumn)[m.leftFlowIdx], rightCol.(intColumn)[m.rightFlowIdx]
+		fmt.Println(leftVal, rightVal)
 		var ok bool
 		if leftVal > rightVal {
-			ok, rightFlow, rightIdx = m.advanceToMatch(leftVal, rightFlow, m.rightEqColIdx, m.right)
-			if !ok && matchIdx == -1 {
+			ok, m.rightFlow, m.rightFlowIdx = m.advanceToMatch(leftVal, m.rightFlow, m.rightEqColIdx, m.right, m.rightFlowIdx)
+			if !ok && m.rightFlowIdx == -1 {
 				// ran out of rows on the right.
-				return dataFlow{}
+				return m.d
 			}
 		} else if leftVal < rightVal {
-			ok, leftFlow, leftIdx = m.advanceToMatch(rightVal, leftFlow, m.leftEqColIdx, m.left)
-			if !ok && matchIdx == -1 {
+			ok, m.leftFlow, m.leftFlowIdx = m.advanceToMatch(rightVal, m.leftFlow, m.leftEqColIdx, m.left, m.leftFlowIdx)
+			fmt.Printf("%t, %s, %d\n", ok, m.leftFlow, m.leftFlowIdx)
+			if !ok && m.leftFlowIdx == -1 {
 				// ran out of rows on the left.
-				return dataFlow{}
+				return m.d
 			}
 		} else { // leftVal == rightVal
 			// buffer rows on both sides.
-			leftFlow = m.bufferMatchGroup(leftVal, leftFlow, m.leftEqColIdx, m.left, leftIdx, m.leftCols, m.leftBatchBuf)
-			rightFlow = m.bufferMatchGroup(rightVal, rightFlow, m.rightEqColIdx, m.right, rightIdx, m.rightCols, m.rightBatchBuf)
+			m.leftFlow, m.leftFlowIdx = m.bufferMatchGroup(leftVal, m.leftFlow, m.leftEqColIdx, m.left, m.leftFlowIdx, m.leftCols, m.leftBatchBuf)
+			m.rightFlow, m.rightFlowIdx = m.bufferMatchGroup(rightVal, m.rightFlow, m.rightEqColIdx, m.right, m.rightFlowIdx, m.rightCols, m.rightBatchBuf)
+			fmt.Println("hoomst")
 
-			// cartesian product the buffers to the output.
-			m.leftBatchIdx = 0
-			avail := batchRowLen - m.d.n
-			repeats := rightFlow.n
-			// copy each left column `repeats` times to the output.
-			for i := m.d.n; i < batchRowLen; i++ {
+			if output, ret := m.maybeOutput(); output {
+				return ret
 			}
-			leftFlow.n = 
+		}
+	}
+}
 
+func (m *mergeJoinIntIntOp) maybeOutput() (bool, dataFlow) {
+	// cartesian product the buffers to the output.
+	avail := batchRowLen - m.d.n
+	fmt.Println(len(m.leftBatchBuf[0].(intColumn)), len(m.rightBatchBuf[0].(intColumn)), m.leftBatchIdx, m.rightBatchIdx)
+	required := (len(m.leftBatchBuf[0].(intColumn))-m.leftBatchIdx)*len(m.rightBatchBuf[0].(intColumn)) - m.rightBatchIdx
+	toCopy := required
+	if avail < required {
+		toCopy = avail
+	}
+	fmt.Println("hi", toCopy)
+	m.d.n += toCopy
+
+	leftBatchIdx, rightBatchIdx := m.leftBatchIdx, m.rightBatchIdx
+
+COLUMNLOOPL:
+	for i := range m.leftCols {
+		// for each column
+		outputCol := m.d.b[i].(intColumn)
+		rowIdx := 0
+		bufCol := m.leftBatchBuf[i].(intColumn)
+		for ; leftBatchIdx < len(bufCol); leftBatchIdx++ {
+			// for each value in the left side
+			val := bufCol[leftBatchIdx]
+			for ; rightBatchIdx < len(m.rightBatchBuf[i].(intColumn)); rightBatchIdx++ {
+				// for each value in the right side... copy it!
+				outputCol[rowIdx] = val
+				rowIdx++
+				if rowIdx >= toCopy {
+					continue COLUMNLOOPL
+				}
+			}
+			rightBatchIdx = 0
 		}
 	}
 
-	return dataFlow{}
+	leftBatchIdx, rightBatchIdx = m.leftBatchIdx, m.rightBatchIdx
+
+COLUMNLOOPR:
+	for i := range m.rightCols {
+		outputCol := m.d.b[i+len(m.leftCols)].(intColumn)
+		rowIdx := 0
+		bufCol := m.rightBatchBuf[i].(intColumn)
+		for ; leftBatchIdx < len(m.leftBatchBuf[i].(intColumn)); leftBatchIdx++ {
+			for ; rightBatchIdx < len(bufCol); rightBatchIdx++ {
+				outputCol[rowIdx] = bufCol[rightBatchIdx]
+				rowIdx++
+				if rowIdx >= toCopy {
+					continue COLUMNLOOPR
+				}
+			}
+			rightBatchIdx = 0
+		}
+	}
+
+	m.leftBatchIdx, m.rightBatchIdx = leftBatchIdx, rightBatchIdx
+
+	if required <= avail {
+		// We got everything into our batch. Clear the bufs.
+		for i := range m.leftBatchBuf {
+			m.leftBatchBuf[i] = m.leftBatchBuf[i].(intColumn)[0:]
+		}
+		for i := range m.rightBatchBuf {
+			m.rightBatchBuf[i] = m.rightBatchBuf[i].(intColumn)[0:]
+		}
+		m.leftBatchIdx, m.rightBatchIdx = 0, 0
+	}
+
+	// output if there's no space left in the buffer
+	return required >= avail, m.d
 }
 
-func (m *mergeJoinIntIntOp) bufferMatchGroup(val int, flow dataFlow, colIdx int, op ExecOp, startIdx int, cols []column, batchBuf batch) dataFlow {
+func (m *mergeJoinIntIntOp) bufferMatchGroup(val int, flow dataFlow, colIdx int, op ExecOp, startIdx int, cols intColumn, batchBuf batch) (dataFlow, int) {
 	for {
-		bufIdx := 0
+		col := flow.b[colIdx].(intColumn)
 		for matchIdx := startIdx; matchIdx < flow.n; matchIdx++ {
-			found := flow.b[colIdx][matchIdx]
+			found := col[matchIdx]
 			if val != found {
-				return flow
+				return flow, matchIdx
 			}
 			// TODO(jordan) fail. this should be col-oriented.
 			// It's hard because this whole process can span batch boundaries.
@@ -94,31 +185,29 @@ func (m *mergeJoinIntIntOp) bufferMatchGroup(val int, flow dataFlow, colIdx int,
 			//   add value to buffer until group's over or batch ends.
 			// if batch ended early, repeat.
 			for i := range cols {
-				batchBuf[i].(intColumn)[matchIdx-startIdx] = flow.b[i].(intColumn)[matchIdx]
+				batchBuf[i] = append(batchBuf[i].(intColumn), flow.b[i].(intColumn)[matchIdx])
 			}
 		}
 		// If we got here, we made it to the end of the batch. We must retrieve the
 		// next batch to ensure there are no more matches in that one.
 		flow = op.Next()
 		if flow.n == 0 {
-			return flow
+			return flow, 0
 		}
 		startIdx = 0
 	}
-	return flow
 }
 
 // returns false if no match
 func (m *mergeJoinIntIntOp) advanceToMatch(val int, flow dataFlow, colIdx int, op ExecOp, startIdx int) (bool, dataFlow, int) {
 	for {
+		col := flow.b[colIdx].(intColumn)
 		for matchIdx := startIdx; matchIdx < flow.n; matchIdx++ {
-			found := flow.b[colIdx][matchIdx]
+			found := col[matchIdx]
 			if val == found {
 				return true, flow, matchIdx
-			} else if val > found {
-				return false, flow, matchIdx
 			} else if val < found {
-				panic("out of order")
+				return false, flow, matchIdx
 			}
 		}
 
@@ -128,20 +217,4 @@ func (m *mergeJoinIntIntOp) advanceToMatch(val int, flow dataFlow, colIdx int, o
 		}
 		startIdx = 0
 	}
-	panic("fail")
-}
-
-type sortedIntGroupOp struct {
-	right ExecOp
-
-	colIdx      int
-	groupColIdx int
-}
-
-func (m *sortedIntGroupOp) Init() {
-}
-
-func (m *sortedIntGroupOp) Next() dataFlow {
-	leftFlow := left.Next()
-	rightFlow := left.Next()
 }
