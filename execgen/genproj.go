@@ -30,13 +30,14 @@ func (p *{{template "opConstName" .}}) Next() dataFlow {
 
 	projCol := flow.b[p.outputIdx].({{.RetTyp.GoTyp}}Column)
 	col := flow.b[p.colIdx].({{.LTyp.GoTyp}}Column)
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			projCol[i] = col[i] {{.OpStr}} p.constArg
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			projCol[i] = col[i] {{.OpStr}} p.constArg
 		}
 	}
@@ -60,13 +61,14 @@ func (p *{{template "opName" .}}) Next() dataFlow {
 	projCol := flow.b[p.outputIdx].({{.RetTyp.GoTyp}}Column)
 	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)
 	col2 := flow.b[p.col2Idx].({{.RTyp.GoTyp}}Column)
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			projCol[i] = col1[i] {{.OpStr}} col2[i]
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			projCol[i] = col1[i] {{.OpStr}} col2[i]
 		}
 	}

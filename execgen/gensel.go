@@ -29,8 +29,9 @@ func (p *{{template "opConstName" .}}) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] {{.OpStr}} p.constArg {
 				flow.sel[idx] = i
@@ -38,7 +39,7 @@ func (p *{{template "opConstName" .}}) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] {{.OpStr}} p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -64,10 +65,11 @@ func (p *{{template "opName" .}}) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)
 	col2 := flow.b[p.col2Idx].({{.RTyp.GoTyp}}Column)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] {{.OpStr}} col2[i] {
 				flow.sel[idx] = i
@@ -75,7 +77,7 @@ func (p *{{template "opName" .}}) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] {{.OpStr}} col2[i] {
 				flow.sel[idx] = i
 				idx++

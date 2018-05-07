@@ -14,8 +14,9 @@ func (p *selEQIntIntConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] == p.constArg {
 				flow.sel[idx] = i
@@ -23,7 +24,7 @@ func (p *selEQIntIntConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] == p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -49,10 +50,11 @@ func (p *selEQIntIntOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	col2 := flow.b[p.col2Idx].(intColumn)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] == col2[i] {
 				flow.sel[idx] = i
@@ -60,7 +62,7 @@ func (p *selEQIntIntOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] == col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -86,8 +88,9 @@ func (p *selEQDoubleDoubleConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] == p.constArg {
 				flow.sel[idx] = i
@@ -95,7 +98,7 @@ func (p *selEQDoubleDoubleConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] == p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -121,10 +124,11 @@ func (p *selEQDoubleDoubleOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	col2 := flow.b[p.col2Idx].(float64Column)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] == col2[i] {
 				flow.sel[idx] = i
@@ -132,7 +136,7 @@ func (p *selEQDoubleDoubleOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] == col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -158,8 +162,9 @@ func (p *selNEIntIntConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] != p.constArg {
 				flow.sel[idx] = i
@@ -167,7 +172,7 @@ func (p *selNEIntIntConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] != p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -193,10 +198,11 @@ func (p *selNEIntIntOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	col2 := flow.b[p.col2Idx].(intColumn)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] != col2[i] {
 				flow.sel[idx] = i
@@ -204,7 +210,7 @@ func (p *selNEIntIntOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] != col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -230,8 +236,9 @@ func (p *selNEDoubleDoubleConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] != p.constArg {
 				flow.sel[idx] = i
@@ -239,7 +246,7 @@ func (p *selNEDoubleDoubleConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] != p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -265,10 +272,11 @@ func (p *selNEDoubleDoubleOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	col2 := flow.b[p.col2Idx].(float64Column)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] != col2[i] {
 				flow.sel[idx] = i
@@ -276,7 +284,7 @@ func (p *selNEDoubleDoubleOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] != col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -302,8 +310,9 @@ func (p *selLTIntIntConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] < p.constArg {
 				flow.sel[idx] = i
@@ -311,7 +320,7 @@ func (p *selLTIntIntConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] < p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -337,10 +346,11 @@ func (p *selLTIntIntOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	col2 := flow.b[p.col2Idx].(intColumn)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] < col2[i] {
 				flow.sel[idx] = i
@@ -348,7 +358,7 @@ func (p *selLTIntIntOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] < col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -374,8 +384,9 @@ func (p *selLTDoubleDoubleConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] < p.constArg {
 				flow.sel[idx] = i
@@ -383,7 +394,7 @@ func (p *selLTDoubleDoubleConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] < p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -409,10 +420,11 @@ func (p *selLTDoubleDoubleOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	col2 := flow.b[p.col2Idx].(float64Column)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] < col2[i] {
 				flow.sel[idx] = i
@@ -420,7 +432,7 @@ func (p *selLTDoubleDoubleOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] < col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -446,8 +458,9 @@ func (p *selLTEIntIntConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] <= p.constArg {
 				flow.sel[idx] = i
@@ -455,7 +468,7 @@ func (p *selLTEIntIntConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] <= p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -481,10 +494,11 @@ func (p *selLTEIntIntOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	col2 := flow.b[p.col2Idx].(intColumn)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] <= col2[i] {
 				flow.sel[idx] = i
@@ -492,7 +506,7 @@ func (p *selLTEIntIntOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] <= col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -518,8 +532,9 @@ func (p *selLTEDoubleDoubleConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] <= p.constArg {
 				flow.sel[idx] = i
@@ -527,7 +542,7 @@ func (p *selLTEDoubleDoubleConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] <= p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -553,10 +568,11 @@ func (p *selLTEDoubleDoubleOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	col2 := flow.b[p.col2Idx].(float64Column)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] <= col2[i] {
 				flow.sel[idx] = i
@@ -564,7 +580,7 @@ func (p *selLTEDoubleDoubleOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] <= col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -590,8 +606,9 @@ func (p *selGTIntIntConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] > p.constArg {
 				flow.sel[idx] = i
@@ -599,7 +616,7 @@ func (p *selGTIntIntConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] > p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -625,10 +642,11 @@ func (p *selGTIntIntOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	col2 := flow.b[p.col2Idx].(intColumn)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] > col2[i] {
 				flow.sel[idx] = i
@@ -636,7 +654,7 @@ func (p *selGTIntIntOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] > col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -662,8 +680,9 @@ func (p *selGTDoubleDoubleConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] > p.constArg {
 				flow.sel[idx] = i
@@ -671,7 +690,7 @@ func (p *selGTDoubleDoubleConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] > p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -697,10 +716,11 @@ func (p *selGTDoubleDoubleOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	col2 := flow.b[p.col2Idx].(float64Column)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] > col2[i] {
 				flow.sel[idx] = i
@@ -708,7 +728,7 @@ func (p *selGTDoubleDoubleOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] > col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -734,8 +754,9 @@ func (p *selGTEIntIntConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] >= p.constArg {
 				flow.sel[idx] = i
@@ -743,7 +764,7 @@ func (p *selGTEIntIntConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] >= p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -769,10 +790,11 @@ func (p *selGTEIntIntOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(intColumn)
 	col2 := flow.b[p.col2Idx].(intColumn)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] >= col2[i] {
 				flow.sel[idx] = i
@@ -780,7 +802,7 @@ func (p *selGTEIntIntOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] >= col2[i] {
 				flow.sel[idx] = i
 				idx++
@@ -806,8 +828,9 @@ func (p *selGTEDoubleDoubleConstOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	idx := 0
+	n := flow.n
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] >= p.constArg {
 				flow.sel[idx] = i
@@ -815,7 +838,7 @@ func (p *selGTEDoubleDoubleConstOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] >= p.constArg {
 				flow.sel[idx] = i
 				idx++
@@ -841,10 +864,11 @@ func (p *selGTEDoubleDoubleOp) Next() dataFlow {
 
 	col1 := flow.b[p.col1Idx].(float64Column)
 	col2 := flow.b[p.col2Idx].(float64Column)
+	n := flow.n
 
 	idx := 0
 	if flow.useSel {
-		for s := 0; s < flow.n; s++ {
+		for s := 0; s < n; s++ {
 			i := flow.sel[s]
 			if col1[i] >= col2[i] {
 				flow.sel[idx] = i
@@ -852,7 +876,7 @@ func (p *selGTEDoubleDoubleOp) Next() dataFlow {
 			}
 		}
 	} else {
-		for i := 0; i < flow.n; i++ {
+		for i := 0; i < n; i++ {
 			if col1[i] >= col2[i] {
 				flow.sel[idx] = i
 				idx++
