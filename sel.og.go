@@ -2,12 +2,10 @@
 
 package exectoy
 
-
-
 type selEQIntIntConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg int
 }
 
@@ -75,10 +73,11 @@ func (p *selEQIntIntOp) Next() dataFlow {
 }
 
 func (p selEQIntIntOp) Init() {}
+
 type selEQDoubleDoubleConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg float64
 }
 
@@ -146,10 +145,11 @@ func (p *selEQDoubleDoubleOp) Next() dataFlow {
 }
 
 func (p selEQDoubleDoubleOp) Init() {}
+
 type selNEIntIntConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg int
 }
 
@@ -217,10 +217,11 @@ func (p *selNEIntIntOp) Next() dataFlow {
 }
 
 func (p selNEIntIntOp) Init() {}
+
 type selNEDoubleDoubleConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg float64
 }
 
@@ -288,10 +289,11 @@ func (p *selNEDoubleDoubleOp) Next() dataFlow {
 }
 
 func (p selNEDoubleDoubleOp) Init() {}
+
 type selLTIntIntConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg int
 }
 
@@ -359,10 +361,11 @@ func (p *selLTIntIntOp) Next() dataFlow {
 }
 
 func (p selLTIntIntOp) Init() {}
+
 type selLTDoubleDoubleConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg float64
 }
 
@@ -430,10 +433,11 @@ func (p *selLTDoubleDoubleOp) Next() dataFlow {
 }
 
 func (p selLTDoubleDoubleOp) Init() {}
+
 type selLTEIntIntConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg int
 }
 
@@ -501,10 +505,11 @@ func (p *selLTEIntIntOp) Next() dataFlow {
 }
 
 func (p selLTEIntIntOp) Init() {}
+
 type selLTEDoubleDoubleConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg float64
 }
 
@@ -572,10 +577,11 @@ func (p *selLTEDoubleDoubleOp) Next() dataFlow {
 }
 
 func (p selLTEDoubleDoubleOp) Init() {}
+
 type selGTIntIntConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg int
 }
 
@@ -643,10 +649,11 @@ func (p *selGTIntIntOp) Next() dataFlow {
 }
 
 func (p selGTIntIntOp) Init() {}
+
 type selGTDoubleDoubleConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg float64
 }
 
@@ -714,10 +721,11 @@ func (p *selGTDoubleDoubleOp) Next() dataFlow {
 }
 
 func (p selGTDoubleDoubleOp) Init() {}
+
 type selGTEIntIntConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg int
 }
 
@@ -785,10 +793,11 @@ func (p *selGTEIntIntOp) Next() dataFlow {
 }
 
 func (p selGTEIntIntOp) Init() {}
+
 type selGTEDoubleDoubleConstOp struct {
 	input ExecOp
 
-	col1Idx   int
+	col1Idx  int
 	constArg float64
 }
 
