@@ -29,7 +29,7 @@ func BenchmarkFilterIntLessThanConstOperator(b *testing.B) {
 	source.Init()
 	randomizeSource(&source)
 
-	var fop selectLTIntIntConstOp
+	var fop selLTIntIntConstOp
 	fop.input = &source
 	fop.constArg = 64
 	fop.col1Idx = 3
@@ -48,7 +48,7 @@ func BenchmarkProjPlusIntIntConst(b *testing.B) {
 	source.Init()
 	randomizeSource(&source)
 
-	var rop projPlusIntIntConst
+	var rop projPlusIntIntConstOp
 	rop.input = &source
 	rop.colIdx = 2
 	rop.constArg = 5
@@ -68,7 +68,7 @@ func BenchmarkProjPlusIntInt(b *testing.B) {
 	source.Init()
 	randomizeSource(&source)
 
-	var rop projPlusIntInt
+	var rop projPlusIntIntOp
 	rop.input = &source
 	rop.col1Idx = 2
 	rop.col2Idx = 3
@@ -88,14 +88,14 @@ func BenchmarkRenderChain(b *testing.B) {
 	source.Init()
 	randomizeSource(&source)
 
-	var rop projPlusIntInt
+	var rop projPlusIntIntOp
 	rop.input = &source
 	rop.col1Idx = 2
 	rop.col2Idx = 3
 	rop.outputIdx = 3
 	rop.Init()
 
-	var rop2 projPlusIntInt
+	var rop2 projPlusIntIntOp
 	rop2.input = &rop
 	rop2.col1Idx = 2
 	rop2.col2Idx = 3
@@ -120,7 +120,7 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 	randomizeSource(&source)
 
 	// first project n -> n+1
-	projOp := projPlusIntIntConst{
+	projOp := projPlusIntIntConstOp{
 		input:     &source,
 		colIdx:    0,
 		constArg:  1,
@@ -129,7 +129,7 @@ func BenchmarkSelectIntPlusConstLTInt(b *testing.B) {
 	projOp.Init()
 
 	// then select (n+1) > m
-	selOp := selectLTIntIntOp{
+	selOp := selLTIntIntOp{
 		input:   &projOp,
 		col1Idx: 1,
 		col2Idx: 0,

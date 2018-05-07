@@ -17,6 +17,13 @@ const (
 	minusOp
 	mulOp
 	divOp
+
+	eqOp
+	neOp
+	ltOp
+	lteOp
+	gtOp
+	gteOp
 )
 
 type typ int
@@ -25,6 +32,7 @@ const (
 	invalidTyp typ = iota
 	intTyp
 	doubleTyp
+	boolTyp
 )
 
 type typDef struct {
@@ -41,13 +49,22 @@ var typs = map[typ]typDef{
 		Name:  "Double",
 		GoTyp: "float64",
 	},
+	boolTyp: typDef{
+		Name:  "Bool",
+		GoTyp: "bool",
+	},
 }
 
 var opNames = map[op]string{
 	plusOp:  "Plus",
 	minusOp: "Minus",
 	mulOp:   "Mul",
-	divOp:   "Div",
+	eqOp:    "EQ",
+	neOp:    "NE",
+	ltOp:    "LT",
+	lteOp:   "LTE",
+	gtOp:    "GT",
+	gteOp:   "GTE",
 }
 
 type overload struct {
@@ -67,6 +84,15 @@ func makeOverload(t typ, opStr string) overload {
 	}
 }
 
+func makePredOverload(t typ, opStr string) overload {
+	return overload{
+		OpStr:  opStr,
+		LTyp:   typs[t],
+		RTyp:   typs[t],
+		RetTyp: typs[boolTyp],
+	}
+}
+
 var opMap = map[op][]overload{
 	plusOp: {
 		makeOverload(intTyp, "+"),
@@ -83,6 +109,30 @@ var opMap = map[op][]overload{
 	divOp: {
 		makeOverload(intTyp, "/"),
 		makeOverload(doubleTyp, "/"),
+	},
+	eqOp: {
+		makePredOverload(intTyp, "=="),
+		makePredOverload(doubleTyp, "=="),
+	},
+	neOp: {
+		makePredOverload(intTyp, "!="),
+		makePredOverload(doubleTyp, "!="),
+	},
+	ltOp: {
+		makePredOverload(intTyp, "<"),
+		makePredOverload(doubleTyp, "<"),
+	},
+	lteOp: {
+		makePredOverload(intTyp, "<="),
+		makePredOverload(doubleTyp, "<="),
+	},
+	gtOp: {
+		makePredOverload(intTyp, ">"),
+		makePredOverload(doubleTyp, ">"),
+	},
+	gteOp: {
+		makePredOverload(intTyp, ">="),
+		makePredOverload(doubleTyp, ">="),
 	},
 }
 
@@ -185,6 +235,11 @@ The commands are:
 	os.Exit(2)
 }
 
+var generators = map[string]func(io.Writer) error{
+	"proj": genProj,
+	"sel":  genSel,
+}
+
 func main() {
 	flag.Parse()
 	flag.Usage = usage
@@ -192,23 +247,23 @@ func main() {
 		usage()
 	}
 
-	wr := os.Stdout
-	if *out != "" {
-		file, err := os.Create(*out)
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-
-		wr = file
-	}
-
 	cmd := flag.Args()[0]
 
-	switch cmd {
-	case "proj":
-		if err := genProj(wr); err != nil {
+	if gen := generators[cmd]; gen != nil {
+		wr := os.Stdout
+		if *out != "" {
+			file, err := os.Create(*out)
+			if err != nil {
+				panic(err)
+			}
+			defer file.Close()
+
+			wr = file
+		}
+		if err := gen(wr); err != nil {
 			panic(err)
 		}
+	} else {
+		usage()
 	}
 }
