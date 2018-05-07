@@ -23,6 +23,24 @@ func randomizeTupleBatchSouce(s *repeatableTupleBatchSource) {
 	}
 }
 
+func BenchmarkZeroOp(b *testing.B) {
+	var source repeatableBatchSource
+	source.numOutputCols = 4
+	source.Init()
+	randomizeSource(&source)
+
+	zeroOp := &zeroIntOp{
+		input:  &source,
+		colIdx: 0,
+	}
+
+	b.SetBytes(int64(8 * batchRowLen * source.numOutputCols))
+
+	for i := 0; i < b.N; i++ {
+		zeroOp.Next()
+	}
+}
+
 func BenchmarkFilterIntLessThanConstOperator(b *testing.B) {
 	var source repeatableBatchSource
 	source.numOutputCols = 4
