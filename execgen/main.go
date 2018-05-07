@@ -6,66 +6,89 @@ import (
 	"text/template"
 )
 
+type op int
+
+const (
+	invalidOp op = iota
+	plusOp
+	minusOp
+	mulOp
+	divOp
+)
+
+type typ int
+
+const (
+	invalidTyp typ = iota
+	intTyp
+	doubleTyp
+)
+
 type typDef struct {
 	Name  string
 	GoTyp string
-	Ops   []opDef
 }
 
-type opDef struct {
-	Name  string
-	OpStr string
-}
-
-var input = struct {
-	Types []typDef
-}{
-	Types: []typDef{
-		{
-			Name:  "Int",
-			GoTyp: "int",
-			Ops: []opDef{
-				{
-					Name:  "Plus",
-					OpStr: "+",
-				},
-				{
-					Name:  "Minus",
-					OpStr: "-",
-				},
-				{
-					Name:  "Div",
-					OpStr: "/",
-				},
-				{
-					Name:  "Mul",
-					OpStr: "*",
-				},
-			},
-		},
-		{
-			Name:  "Double",
-			GoTyp: "float64",
-			Ops: []opDef{
-				{
-					Name:  "Plus",
-					OpStr: "+",
-				},
-				{
-					Name:  "Minus",
-					OpStr: "-",
-				},
-				{
-					Name:  "Div",
-					OpStr: "/",
-				},
-				{
-					Name:  "Mul",
-					OpStr: "*",
-				},
-			},
-		},
+var typs = map[typ]typDef{
+	intTyp: typDef{
+		Name:  "Int",
+		GoTyp: "int",
 	},
+	doubleTyp: typDef{
+		Name:  "Double",
+		GoTyp: "float64",
+	},
+}
+
+var opNames = map[op]string{
+	plusOp:  "Plus",
+	minusOp: "Minus",
+	mulOp:   "Mul",
+	divOp:   "Div",
+}
+
+type overload struct {
+	Name   string
+	OpStr  string
+	LTyp   typDef
+	RTyp   typDef
+	RetTyp typDef
+}
+
+func makeOverload(t typ, opStr string) overload {
+	return overload{
+		OpStr:  opStr,
+		LTyp:   typs[t],
+		RTyp:   typs[t],
+		RetTyp: typs[t],
+	}
+}
+
+var opMap = map[op][]overload{
+	plusOp: {
+		makeOverload(intTyp, "+"),
+		makeOverload(doubleTyp, "+"),
+	},
+	minusOp: {
+		makeOverload(intTyp, "-"),
+		makeOverload(doubleTyp, "-"),
+	},
+	mulOp: {
+		makeOverload(intTyp, "-"),
+		makeOverload(doubleTyp, "-"),
+	},
+	divOp: {
+		makeOverload(intTyp, "/"),
+		makeOverload(doubleTyp, "/"),
+	},
+}
+
+func init() {
+	for i := range opMap {
+		for j := range opMap[i] {
+			opMap[i][j].Name = opNames[i]
+		}
+	}
 }
 
 func main() {
@@ -73,22 +96,25 @@ func main() {
 
 package exectoy
 
-{{range $typ := .Types}}
-{{range .Ops}}
-type proj{{.Name}}{{$typ.Name}}{{$typ.Name}}Const struct {
+{{define "opConstName"}}proj{{.Name}}{{.LTyp.Name}}{{.RTyp.Name}}ConstOp{{end}}
+{{define "opName"}}proj{{.Name}}{{.LTyp.Name}}{{.RTyp.Name}}Op{{end}}
+
+{{- range .}}
+{{- range .}}
+type {{template "opConstName" .}} struct {
 	input ExecOp
 
 	colIdx   int
-	constArg {{$typ.GoTyp}}
+	constArg {{.RTyp.GoTyp}}
 
 	outputIdx int
 }
 
-func (p *proj{{.Name}}{{$typ.Name}}{{$typ.Name}}Const) Next() dataFlow {
+func (p *{{template "opConstName" .}}) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].({{$typ.GoTyp}}Column)
-	col := flow.b[p.colIdx].({{$typ.GoTyp}}Column)
+	projCol := flow.b[p.outputIdx].({{.RetTyp.GoTyp}}Column)
+	col := flow.b[p.colIdx].({{.LTyp.GoTyp}}Column)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -102,9 +128,9 @@ func (p *proj{{.Name}}{{$typ.Name}}{{$typ.Name}}Const) Next() dataFlow {
 	return flow
 }
 
-func (p proj{{.Name}}{{$typ.Name}}{{$typ.Name}}Const) Init() {}
+func (p {{template "opConstName" .}}) Init() {}
 
-type proj{{.Name}}{{$typ.Name}}{{$typ.Name}} struct {
+type {{template "opName" .}} struct {
 	input ExecOp
 
 	col1Idx int
@@ -113,12 +139,12 @@ type proj{{.Name}}{{$typ.Name}}{{$typ.Name}} struct {
 	outputIdx int
 }
 
-func (p *proj{{.Name}}{{$typ.Name}}{{$typ.Name}}) Next() dataFlow {
+func (p *{{template "opName" .}}) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].({{$typ.GoTyp}}Column)
-	col1 := flow.b[p.col1Idx].({{$typ.GoTyp}}Column)
-	col2 := flow.b[p.col2Idx].({{$typ.GoTyp}}Column)
+	projCol := flow.b[p.outputIdx].({{.RetTyp.GoTyp}}Column)
+	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)
+	col2 := flow.b[p.col2Idx].({{.RTyp.GoTyp}}Column)
 	if flow.useSel {
 		for s := 0; s < flow.n; s++ {
 			i := flow.sel[s]
@@ -132,15 +158,15 @@ func (p *proj{{.Name}}{{$typ.Name}}{{$typ.Name}}) Next() dataFlow {
 	return flow
 }
 
-func (p proj{{.Name}}{{$typ.Name}}{{$typ.Name}}) Init() {}
-{{end}}
-{{end}}
+func (p {{template "opName" .}}) Init() {}
+{{- end}}
+{{- end}}
 `)
 	if err != nil {
 		panic(err)
 	}
 
-	err = tmpl.Execute(os.Stdout, input)
+	err = tmpl.Execute(os.Stdout, opMap)
 	if err != nil {
 		panic(err)
 	}
