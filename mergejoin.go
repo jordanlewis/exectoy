@@ -1,7 +1,5 @@
 package exectoy
 
-import "fmt"
-
 type mergeJoinIntIntOp struct {
 	left  ExecOp
 	right ExecOp
@@ -58,15 +56,11 @@ func (m *mergeJoinIntIntOp) Next() dataFlow {
 	}
 
 	if m.leftFlow.n == 0 {
-		fmt.Println("Had to next left")
 		m.leftFlow = m.left.Next()
 	}
 	if m.rightFlow.n == 0 {
-		fmt.Println("Had to next right")
 		m.rightFlow = m.right.Next()
 	}
-	fmt.Println("left:", m.leftFlow)
-	fmt.Println("right:", m.rightFlow)
 	if m.leftFlow.n == 0 || m.rightFlow.n == 0 {
 		ret := m.d
 		m.d.n = 0
@@ -77,13 +71,11 @@ func (m *mergeJoinIntIntOp) Next() dataFlow {
 	for {
 		// todo(jordan) deal with sel
 		leftVal, rightVal := leftCol.(intColumn)[m.leftFlowIdx], rightCol.(intColumn)[m.rightFlowIdx]
-		fmt.Printf("Enter merge loop. left[%d]: %d, right[%d]: %d\n", m.leftFlowIdx, leftVal, m.rightFlowIdx, rightVal)
 		var ok bool
 		if leftVal > rightVal {
 			ok, m.rightFlow, m.rightFlowIdx = m.advanceToMatch(leftVal, m.rightFlow, m.rightEqColIdx, m.right, m.rightFlowIdx)
 			if !ok && m.rightFlowIdx == -1 {
 				// ran out of rows on the right.
-				fmt.Println("Returning dregs - no more right")
 				ret := m.d
 				m.d.n = 0
 				return ret
@@ -92,7 +84,6 @@ func (m *mergeJoinIntIntOp) Next() dataFlow {
 			ok, m.leftFlow, m.leftFlowIdx = m.advanceToMatch(rightVal, m.leftFlow, m.leftEqColIdx, m.left, m.leftFlowIdx)
 			if !ok && m.leftFlowIdx == -1 {
 				// ran out of rows on the left.
-				fmt.Println("Returning dregs - no more left")
 				ret := m.d
 				m.d.n = 0
 				return ret
@@ -101,9 +92,6 @@ func (m *mergeJoinIntIntOp) Next() dataFlow {
 			// buffer rows on both sides.
 			m.leftFlow, m.leftFlowIdx = m.bufferMatchGroup(leftVal, m.leftFlow, m.leftEqColIdx, m.left, m.leftFlowIdx, m.leftCols, m.leftBatchBuf)
 			m.rightFlow, m.rightFlowIdx = m.bufferMatchGroup(rightVal, m.rightFlow, m.rightEqColIdx, m.right, m.rightFlowIdx, m.rightCols, m.rightBatchBuf)
-			fmt.Println("Done buffering. indexes are now", m.leftFlowIdx, m.rightFlowIdx)
-			fmt.Println("Done buffering. flows are now", m.leftFlow, m.rightFlow)
-			fmt.Println("Done buffering. batchBufs are now", m.leftBatchBuf, m.rightBatchBuf)
 			if m.maybeOutput() {
 				return m.d
 			}
@@ -115,9 +103,7 @@ func (m *mergeJoinIntIntOp) maybeOutput() bool {
 	// cartesian product the buffers to the output.
 	avail := batchRowLen - m.d.n
 	required := (len(m.leftBatchBuf[0].(intColumn)) - m.leftBatchIdx) * (len(m.rightBatchBuf[0].(intColumn)) - m.rightBatchIdx)
-	fmt.Println("Hello from maybeOutput", m.leftBatchIdx, m.rightBatchIdx, avail, required)
 	if required == 0 {
-		fmt.Println("Nothing to output")
 		return false
 	}
 	toCopy := required
@@ -131,18 +117,15 @@ func (m *mergeJoinIntIntOp) maybeOutput() bool {
 COLUMNLOOPL:
 	for i := range m.leftCols {
 		leftBatchIdx, rightBatchIdx = m.leftBatchIdx, m.rightBatchIdx
-		fmt.Println("Copying left col", i)
 		// for each column
 		outputCol := m.d.b[i].(intColumn)
 		rowIdx := 0
 		bufCol := m.leftBatchBuf[i].(intColumn)
 		for ; leftBatchIdx < len(bufCol); leftBatchIdx++ {
-			fmt.Println("Copying left col idx", leftBatchIdx, len(bufCol))
 			// for each value in the left side
 			val := bufCol[leftBatchIdx]
 			for ; rightBatchIdx < len(m.rightBatchBuf[i].(intColumn)); rightBatchIdx++ {
 				// for each value in the right side... copy it!
-				fmt.Printf("Copying to lcol %d: %d\n", i, val)
 				outputCol[rowIdx] = val
 				rowIdx++
 				if rowIdx >= toCopy {
@@ -174,7 +157,6 @@ COLUMNLOOPR:
 	m.leftBatchIdx, m.rightBatchIdx = leftBatchIdx, rightBatchIdx
 
 	if required <= avail {
-		fmt.Println("Clearing bufs")
 		// We got everything into our batch. Clear the bufs.
 		for i := range m.leftBatchBuf {
 			m.leftBatchBuf[i] = m.leftBatchBuf[i].(intColumn)[:0]
@@ -209,7 +191,6 @@ func (m *mergeJoinIntIntOp) bufferMatchGroup(val int, flow dataFlow, colIdx int,
 		}
 		// If we got here, we made it to the end of the batch. We must retrieve the
 		// next batch to ensure there are no more matches in that one.
-		fmt.Println("Made it to the end of the batch")
 		flow = op.Next()
 		if flow.n == 0 {
 			return flow, 0
