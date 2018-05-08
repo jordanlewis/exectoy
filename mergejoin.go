@@ -126,19 +126,23 @@ func (m *mergeJoinIntIntOp) maybeOutput() bool {
 	}
 	m.d.n += toCopy
 
-	leftBatchIdx, rightBatchIdx := m.leftBatchIdx, m.rightBatchIdx
+	var leftBatchIdx, rightBatchIdx int
 
 COLUMNLOOPL:
 	for i := range m.leftCols {
+		leftBatchIdx, rightBatchIdx = m.leftBatchIdx, m.rightBatchIdx
+		fmt.Println("Copying left col", i)
 		// for each column
 		outputCol := m.d.b[i].(intColumn)
 		rowIdx := 0
 		bufCol := m.leftBatchBuf[i].(intColumn)
 		for ; leftBatchIdx < len(bufCol); leftBatchIdx++ {
+			fmt.Println("Copying left col idx", leftBatchIdx, len(bufCol))
 			// for each value in the left side
 			val := bufCol[leftBatchIdx]
 			for ; rightBatchIdx < len(m.rightBatchBuf[i].(intColumn)); rightBatchIdx++ {
 				// for each value in the right side... copy it!
+				fmt.Printf("Copying to lcol %d: %d\n", i, val)
 				outputCol[rowIdx] = val
 				rowIdx++
 				if rowIdx >= toCopy {
@@ -149,10 +153,9 @@ COLUMNLOOPL:
 		}
 	}
 
-	leftBatchIdx, rightBatchIdx = m.leftBatchIdx, m.rightBatchIdx
-
 COLUMNLOOPR:
 	for i := range m.rightCols {
+		leftBatchIdx, rightBatchIdx = m.leftBatchIdx, m.rightBatchIdx
 		outputCol := m.d.b[i+len(m.leftCols)].(intColumn)
 		rowIdx := 0
 		bufCol := m.rightBatchBuf[i].(intColumn)

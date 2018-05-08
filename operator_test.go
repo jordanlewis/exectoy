@@ -153,6 +153,30 @@ func TestMergeJoin(t *testing.T) {
 				tuple{5, 2, 5, 3},
 			},
 		},
+		{
+			leftEqColIdx:  0,
+			rightEqColIdx: 1,
+			leftNCols:     4,
+			rightNCols:    4,
+			leftTuples: []tuple{
+				tuple{1, 2, 3, 4},
+				tuple{5, 2, 3, 5},
+				tuple{5, 3, 3, 5},
+			},
+			rightTuples: []tuple{
+				tuple{1, 5, 3, 4},
+				tuple{1, 5, 4, 4},
+				tuple{1, 6, 3, 5},
+			},
+			leftCols:  []int{0, 1},
+			rightCols: []int{1, 2},
+			expected: []tuple{
+				tuple{5, 2, 5, 3},
+				tuple{5, 2, 5, 4},
+				tuple{5, 3, 5, 3},
+				tuple{5, 3, 5, 4},
+			},
+		},
 	}
 
 	for _, tc := range tcs {
