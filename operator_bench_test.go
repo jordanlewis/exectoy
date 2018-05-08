@@ -206,3 +206,32 @@ func BenchmarkSortedDistinct(b *testing.B) {
 		sdop.Next()
 	}
 }
+
+func BenchmarkMergeJoin(b *testing.B) {
+	sourceL := &repeatableBatchSource{
+		numOutputCols: 4,
+	}
+	sourceL.Init()
+	randomizeSource(sourceL)
+
+	sourceR := &repeatableBatchSource{
+		numOutputCols: 4,
+	}
+	sourceR.Init()
+	randomizeSource(sourceR)
+
+	mj := &mergeJoinIntIntOp{
+		left:          sourceL,
+		right:         sourceR,
+		leftEqColIdx:  1,
+		rightEqColIdx: 1,
+		leftCols:      []int{1, 2},
+		rightCols:     []int{2, 3},
+	}
+	mj.Init()
+
+	b.SetBytes(int64(8 * batchRowLen * 4))
+	for i := 0; i < b.N; i++ {
+		mj.Next()
+	}
+}
