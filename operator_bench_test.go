@@ -80,6 +80,47 @@ func BenchmarkProjPlusIntIntConst(b *testing.B) {
 	}
 }
 
+func BenchmarkSlice(b *testing.B) {
+	bat := make([]int, 2048)
+	for i := range bat {
+		bat[i] = i
+	}
+	cols := make([][]int, 2)
+	cols[0] = bat[:1024]
+	cols[1] = bat[1024:]
+
+	b.SetBytes(8 * 2048)
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 1024; j++ {
+			cols[1][j] = cols[0][j] + 1
+		}
+	}
+}
+
+type fixedIntCol [1024]int
+
+func BenchmarkArray(b *testing.B) {
+	cols := make([]column, 5)
+
+	for i := range cols {
+		var col fixedIntCol
+		cols[i] = &col
+		for j := range col {
+			col[j] = i + j
+		}
+	}
+
+	colA := cols[1].(*fixedIntCol)
+	colB := cols[3].(*fixedIntCol)
+
+	b.SetBytes(8 * 2048)
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 1024; j++ {
+			colB[j] = colA[j] + 1
+		}
+	}
+}
+
 func BenchmarkProjPlusIntInt(b *testing.B) {
 	var source repeatableBatchSource
 	source.numOutputCols = 4
