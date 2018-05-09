@@ -118,7 +118,7 @@ COLUMNLOOPL:
 	for i := range m.leftCols {
 		leftBatchIdx, rightBatchIdx = m.leftBatchIdx, m.rightBatchIdx
 		// for each column
-		outputCol := m.d.b[i].(intColumn)
+		outputCol := m.d.b[i].(intColumn)[:batchRowLen]
 		rowIdx := 0
 		bufCol := m.leftBatchBuf[i].(intColumn)
 		for ; leftBatchIdx < len(bufCol); leftBatchIdx++ {
@@ -139,7 +139,7 @@ COLUMNLOOPL:
 COLUMNLOOPR:
 	for i := range m.rightCols {
 		leftBatchIdx, rightBatchIdx = m.leftBatchIdx, m.rightBatchIdx
-		outputCol := m.d.b[i+len(m.leftCols)].(intColumn)
+		outputCol := m.d.b[i+len(m.leftCols)].(intColumn)[:batchRowLen]
 		rowIdx := 0
 		bufCol := m.rightBatchBuf[i].(intColumn)
 		for ; leftBatchIdx < len(m.leftBatchBuf[i].(intColumn)); leftBatchIdx++ {
@@ -173,7 +173,7 @@ COLUMNLOOPR:
 
 func (m *mergeJoinIntIntOp) bufferMatchGroup(val int, flow dataFlow, colIdx int, op ExecOp, startIdx int, cols intColumn, batchBuf batch) (dataFlow, int) {
 	for {
-		col := flow.b[colIdx].(intColumn)
+		col := flow.b[colIdx].(intColumn)[:batchRowLen]
 		for matchIdx := startIdx; matchIdx < flow.n; matchIdx++ {
 			found := col[matchIdx]
 			if val != found {
@@ -202,7 +202,7 @@ func (m *mergeJoinIntIntOp) bufferMatchGroup(val int, flow dataFlow, colIdx int,
 // returns false if no match
 func (m *mergeJoinIntIntOp) advanceToMatch(val int, flow dataFlow, colIdx int, op ExecOp, startIdx int) (bool, dataFlow, int) {
 	for {
-		col := flow.b[colIdx].(intColumn)
+		col := flow.b[colIdx].(intColumn)[:batchRowLen]
 		for matchIdx := startIdx; matchIdx < flow.n; matchIdx++ {
 			found := col[matchIdx]
 			if val == found {

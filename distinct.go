@@ -31,11 +31,12 @@ func (p *sortedDistinctIntOp) Next() dataFlow {
 		return flow
 	}
 	p.col = flow.b[p.sortedDistinctCol].(intColumn)
-	outputCol := flow.b[p.outputColIdx].(intColumn)
+	col := p.col[:batchRowLen]
+	outputCol := flow.b[p.outputColIdx].(intColumn)[:batchRowLen]
 
 	// we always output the first row.
 	for i := 0; i < p.firstColToLookAt; i++ {
-		p.lastVal = p.col[0]
+		p.lastVal = col[0]
 		outputCol[i] = 1
 	}
 
@@ -49,8 +50,8 @@ func (p *sortedDistinctIntOp) Next() dataFlow {
 				lastVal = col[i]
 			}
 			*/
-			outputCol[i] |= (p.col[i] - p.lastVal)
-			p.lastVal = p.col[i]
+			outputCol[i] |= (col[i] - p.lastVal)
+			p.lastVal = col[i]
 		}
 	} else {
 		for i := p.firstColToLookAt; i < flow.n; i++ {
@@ -61,8 +62,8 @@ func (p *sortedDistinctIntOp) Next() dataFlow {
 				lastVal = col[i]
 			}
 			*/
-			outputCol[i] |= (p.col[i] - p.lastVal)
-			p.lastVal = p.col[i]
+			outputCol[i] |= (col[i] - p.lastVal)
+			p.lastVal = col[i]
 		}
 	}
 
@@ -85,7 +86,7 @@ func (p sortedDistinctFinalizerOp) Next() dataFlow {
 		return flow
 	}
 
-	outputCol := flow.b[p.outputColIdx].(intColumn)
+	outputCol := flow.b[p.outputColIdx].(intColumn)[:batchRowLen]
 
 	// convert outputVec to sel
 	idx := 0

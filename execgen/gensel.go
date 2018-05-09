@@ -27,7 +27,7 @@ type {{template "opConstName" .}} struct {
 func (p *{{template "opConstName" .}}) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)
+	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -63,8 +63,8 @@ type {{template "opName" .}} struct {
 func (p *{{template "opName" .}}) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)
-	col2 := flow.b[p.col2Idx].({{.RTyp.GoTyp}}Column)
+	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].({{.RTyp.GoTyp}}Column)[:batchRowLen]
 	n := flow.n
 
 	idx := 0

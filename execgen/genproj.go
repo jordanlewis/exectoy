@@ -28,8 +28,8 @@ type {{template "opConstName" .}} struct {
 func (p *{{template "opConstName" .}}) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].({{.RetTyp.GoTyp}}Column)
-	col := flow.b[p.colIdx].({{.LTyp.GoTyp}}Column)
+	projCol := flow.b[p.outputIdx].({{.RetTyp.GoTyp}}Column)[:batchRowLen]
+	col := flow.b[p.colIdx].({{.LTyp.GoTyp}}Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -58,9 +58,9 @@ type {{template "opName" .}} struct {
 func (p *{{template "opName" .}}) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].({{.RetTyp.GoTyp}}Column)
-	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)
-	col2 := flow.b[p.col2Idx].({{.RTyp.GoTyp}}Column)
+	projCol := flow.b[p.outputIdx].({{.RetTyp.GoTyp}}Column)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].({{.LTyp.GoTyp}}Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].({{.RTyp.GoTyp}}Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {

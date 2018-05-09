@@ -14,8 +14,8 @@ type projPlusIntIntConstOp struct {
 func (p *projPlusIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(intColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -44,9 +44,9 @@ type projPlusIntIntOp struct {
 func (p *projPlusIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(intColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -75,8 +75,8 @@ type projPlusDoubleDoubleConstOp struct {
 func (p *projPlusDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(float64Column)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(float64Column)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -105,9 +105,9 @@ type projPlusDoubleDoubleOp struct {
 func (p *projPlusDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(float64Column)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(float64Column)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -136,8 +136,8 @@ type projMinusIntIntConstOp struct {
 func (p *projMinusIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(intColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -166,9 +166,9 @@ type projMinusIntIntOp struct {
 func (p *projMinusIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(intColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -197,8 +197,8 @@ type projMinusDoubleDoubleConstOp struct {
 func (p *projMinusDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(float64Column)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(float64Column)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -227,9 +227,9 @@ type projMinusDoubleDoubleOp struct {
 func (p *projMinusDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(float64Column)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(float64Column)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -258,8 +258,8 @@ type projMulIntIntConstOp struct {
 func (p *projMulIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(intColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -288,9 +288,9 @@ type projMulIntIntOp struct {
 func (p *projMulIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(intColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -319,8 +319,8 @@ type projMulDoubleDoubleConstOp struct {
 func (p *projMulDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(float64Column)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(float64Column)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -349,9 +349,9 @@ type projMulDoubleDoubleOp struct {
 func (p *projMulDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(float64Column)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(float64Column)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -380,8 +380,8 @@ type projIntIntConstOp struct {
 func (p *projIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(intColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -410,9 +410,9 @@ type projIntIntOp struct {
 func (p *projIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(intColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(intColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -441,8 +441,8 @@ type projDoubleDoubleConstOp struct {
 func (p *projDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(float64Column)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(float64Column)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -471,9 +471,9 @@ type projDoubleDoubleOp struct {
 func (p *projDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(float64Column)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(float64Column)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -502,8 +502,8 @@ type projEQIntIntConstOp struct {
 func (p *projEQIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -532,9 +532,9 @@ type projEQIntIntOp struct {
 func (p *projEQIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -563,8 +563,8 @@ type projEQDoubleDoubleConstOp struct {
 func (p *projEQDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -593,9 +593,9 @@ type projEQDoubleDoubleOp struct {
 func (p *projEQDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -624,8 +624,8 @@ type projNEIntIntConstOp struct {
 func (p *projNEIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -654,9 +654,9 @@ type projNEIntIntOp struct {
 func (p *projNEIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -685,8 +685,8 @@ type projNEDoubleDoubleConstOp struct {
 func (p *projNEDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -715,9 +715,9 @@ type projNEDoubleDoubleOp struct {
 func (p *projNEDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -746,8 +746,8 @@ type projLTIntIntConstOp struct {
 func (p *projLTIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -776,9 +776,9 @@ type projLTIntIntOp struct {
 func (p *projLTIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -807,8 +807,8 @@ type projLTDoubleDoubleConstOp struct {
 func (p *projLTDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -837,9 +837,9 @@ type projLTDoubleDoubleOp struct {
 func (p *projLTDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -868,8 +868,8 @@ type projLTEIntIntConstOp struct {
 func (p *projLTEIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -898,9 +898,9 @@ type projLTEIntIntOp struct {
 func (p *projLTEIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -929,8 +929,8 @@ type projLTEDoubleDoubleConstOp struct {
 func (p *projLTEDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -959,9 +959,9 @@ type projLTEDoubleDoubleOp struct {
 func (p *projLTEDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -990,8 +990,8 @@ type projGTIntIntConstOp struct {
 func (p *projGTIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -1020,9 +1020,9 @@ type projGTIntIntOp struct {
 func (p *projGTIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -1051,8 +1051,8 @@ type projGTDoubleDoubleConstOp struct {
 func (p *projGTDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -1081,9 +1081,9 @@ type projGTDoubleDoubleOp struct {
 func (p *projGTDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -1112,8 +1112,8 @@ type projGTEIntIntConstOp struct {
 func (p *projGTEIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -1142,9 +1142,9 @@ type projGTEIntIntOp struct {
 func (p *projGTEIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -1173,8 +1173,8 @@ type projGTEDoubleDoubleConstOp struct {
 func (p *projGTEDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col := flow.b[p.colIdx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col := flow.b[p.colIdx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {
@@ -1203,9 +1203,9 @@ type projGTEDoubleDoubleOp struct {
 func (p *projGTEDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	projCol := flow.b[p.outputIdx].(boolColumn)
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	projCol := flow.b[p.outputIdx].(boolColumn)[:batchRowLen]
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 	if flow.useSel {
 		for s := 0; s < n; s++ {

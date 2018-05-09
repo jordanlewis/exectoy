@@ -12,7 +12,7 @@ type selEQIntIntConstOp struct {
 func (p *selEQIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -48,8 +48,8 @@ type selEQIntIntOp struct {
 func (p *selEQIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -86,7 +86,7 @@ type selEQDoubleDoubleConstOp struct {
 func (p *selEQDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -122,8 +122,8 @@ type selEQDoubleDoubleOp struct {
 func (p *selEQDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -160,7 +160,7 @@ type selNEIntIntConstOp struct {
 func (p *selNEIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -196,8 +196,8 @@ type selNEIntIntOp struct {
 func (p *selNEIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -234,7 +234,7 @@ type selNEDoubleDoubleConstOp struct {
 func (p *selNEDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -270,8 +270,8 @@ type selNEDoubleDoubleOp struct {
 func (p *selNEDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -308,7 +308,7 @@ type selLTIntIntConstOp struct {
 func (p *selLTIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -344,8 +344,8 @@ type selLTIntIntOp struct {
 func (p *selLTIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -382,7 +382,7 @@ type selLTDoubleDoubleConstOp struct {
 func (p *selLTDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -418,8 +418,8 @@ type selLTDoubleDoubleOp struct {
 func (p *selLTDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -456,7 +456,7 @@ type selLTEIntIntConstOp struct {
 func (p *selLTEIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -492,8 +492,8 @@ type selLTEIntIntOp struct {
 func (p *selLTEIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -530,7 +530,7 @@ type selLTEDoubleDoubleConstOp struct {
 func (p *selLTEDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -566,8 +566,8 @@ type selLTEDoubleDoubleOp struct {
 func (p *selLTEDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -604,7 +604,7 @@ type selGTIntIntConstOp struct {
 func (p *selGTIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -640,8 +640,8 @@ type selGTIntIntOp struct {
 func (p *selGTIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -678,7 +678,7 @@ type selGTDoubleDoubleConstOp struct {
 func (p *selGTDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -714,8 +714,8 @@ type selGTDoubleDoubleOp struct {
 func (p *selGTDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -752,7 +752,7 @@ type selGTEIntIntConstOp struct {
 func (p *selGTEIntIntConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -788,8 +788,8 @@ type selGTEIntIntOp struct {
 func (p *selGTEIntIntOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(intColumn)
-	col2 := flow.b[p.col2Idx].(intColumn)
+	col1 := flow.b[p.col1Idx].(intColumn)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(intColumn)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
@@ -826,7 +826,7 @@ type selGTEDoubleDoubleConstOp struct {
 func (p *selGTEDoubleDoubleConstOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
 	idx := 0
 	n := flow.n
 	if flow.useSel {
@@ -862,8 +862,8 @@ type selGTEDoubleDoubleOp struct {
 func (p *selGTEDoubleDoubleOp) Next() dataFlow {
 	flow := p.input.Next()
 
-	col1 := flow.b[p.col1Idx].(float64Column)
-	col2 := flow.b[p.col2Idx].(float64Column)
+	col1 := flow.b[p.col1Idx].(float64Column)[:batchRowLen]
+	col2 := flow.b[p.col2Idx].(float64Column)[:batchRowLen]
 	n := flow.n
 
 	idx := 0
